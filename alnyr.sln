@@ -3,7 +3,55 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2019
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "srima rendering framework", "srima rendering framework\srima rendering framework.vcxproj", "{2435B528-461B-41C0-8433-99C852808BCF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kara phisycs framework", "kara phisycs framework\kara phisycs framework.vcxproj", "{5267BFBC-B7CC-4C39-9347-2B2FA5D91360}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "alnyr game engine", "alnyr game engine\alnyr game engine.vcxproj", "{A03981DA-1FB0-49F7-96EE-C429738FCDAC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "1.alnyr_sample", "alnyr_sample\alnyr_sample.vcxproj", "{C4EFCF71-CF60-44C3-94F5-5A6D4EDAED32}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2435B528-461B-41C0-8433-99C852808BCF}.Debug|x64.ActiveCfg = Debug|x64
+		{2435B528-461B-41C0-8433-99C852808BCF}.Debug|x64.Build.0 = Debug|x64
+		{2435B528-461B-41C0-8433-99C852808BCF}.Debug|x86.ActiveCfg = Debug|Win32
+		{2435B528-461B-41C0-8433-99C852808BCF}.Debug|x86.Build.0 = Debug|Win32
+		{2435B528-461B-41C0-8433-99C852808BCF}.Release|x64.ActiveCfg = Release|x64
+		{2435B528-461B-41C0-8433-99C852808BCF}.Release|x64.Build.0 = Release|x64
+		{2435B528-461B-41C0-8433-99C852808BCF}.Release|x86.ActiveCfg = Release|Win32
+		{2435B528-461B-41C0-8433-99C852808BCF}.Release|x86.Build.0 = Release|Win32
+		{5267BFBC-B7CC-4C39-9347-2B2FA5D91360}.Debug|x64.ActiveCfg = Debug|x64
+		{5267BFBC-B7CC-4C39-9347-2B2FA5D91360}.Debug|x64.Build.0 = Debug|x64
+		{5267BFBC-B7CC-4C39-9347-2B2FA5D91360}.Debug|x86.ActiveCfg = Debug|Win32
+		{5267BFBC-B7CC-4C39-9347-2B2FA5D91360}.Debug|x86.Build.0 = Debug|Win32
+		{5267BFBC-B7CC-4C39-9347-2B2FA5D91360}.Release|x64.ActiveCfg = Release|x64
+		{5267BFBC-B7CC-4C39-9347-2B2FA5D91360}.Release|x64.Build.0 = Release|x64
+		{5267BFBC-B7CC-4C39-9347-2B2FA5D91360}.Release|x86.ActiveCfg = Release|Win32
+		{5267BFBC-B7CC-4C39-9347-2B2FA5D91360}.Release|x86.Build.0 = Release|Win32
+		{A03981DA-1FB0-49F7-96EE-C429738FCDAC}.Debug|x64.ActiveCfg = Debug|x64
+		{A03981DA-1FB0-49F7-96EE-C429738FCDAC}.Debug|x64.Build.0 = Debug|x64
+		{A03981DA-1FB0-49F7-96EE-C429738FCDAC}.Debug|x86.ActiveCfg = Debug|Win32
+		{A03981DA-1FB0-49F7-96EE-C429738FCDAC}.Debug|x86.Build.0 = Debug|Win32
+		{A03981DA-1FB0-49F7-96EE-C429738FCDAC}.Release|x64.ActiveCfg = Release|x64
+		{A03981DA-1FB0-49F7-96EE-C429738FCDAC}.Release|x64.Build.0 = Release|x64
+		{A03981DA-1FB0-49F7-96EE-C429738FCDAC}.Release|x86.ActiveCfg = Release|Win32
+		{A03981DA-1FB0-49F7-96EE-C429738FCDAC}.Release|x86.Build.0 = Release|Win32
+		{C4EFCF71-CF60-44C3-94F5-5A6D4EDAED32}.Debug|x64.ActiveCfg = Debug|x64
+		{C4EFCF71-CF60-44C3-94F5-5A6D4EDAED32}.Debug|x64.Build.0 = Debug|x64
+		{C4EFCF71-CF60-44C3-94F5-5A6D4EDAED32}.Debug|x86.ActiveCfg = Debug|Win32
+		{C4EFCF71-CF60-44C3-94F5-5A6D4EDAED32}.Debug|x86.Build.0 = Debug|Win32
+		{C4EFCF71-CF60-44C3-94F5-5A6D4EDAED32}.Release|x64.ActiveCfg = Release|x64
+		{C4EFCF71-CF60-44C3-94F5-5A6D4EDAED32}.Release|x64.Build.0 = Release|x64
+		{C4EFCF71-CF60-44C3-94F5-5A6D4EDAED32}.Release|x86.ActiveCfg = Release|Win32
+		{C4EFCF71-CF60-44C3-94F5-5A6D4EDAED32}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
