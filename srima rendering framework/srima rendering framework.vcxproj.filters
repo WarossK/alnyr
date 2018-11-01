@@ -18,18 +18,18 @@
     <ClInclude Include="srima.hpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="src\srima_window.h">
+    <ClInclude Include="srima_src\srima_shader.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="src\srima_shader.h">
+    <ClInclude Include="srima_src\srima_window.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\srima.cpp">
+    <ClCompile Include="srima_src\srima.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="src\srima_window.cpp">
+    <ClCompile Include="srima_src\srima_window.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

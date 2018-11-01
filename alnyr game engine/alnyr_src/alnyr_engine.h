@@ -1,11 +1,13 @@
 #pragma once
 
-#include <memory>
-#include "alnyr_scene_manager.h"
-#include "../../srima rendering framework/src/srima_window.h"
+#include <type_traits>
 
+namespace srima { namespace window { class srimaWindow; } }
 namespace alnyr
 {
+	class alnyrScene;
+	class alnyrSceneManager;
+
 	class alnyrEngine
 	{
 		friend alnyrEngine* CreateEngine();
@@ -23,11 +25,12 @@ namespace alnyr
 		void Run();
 		void Uninitialize();
 
-		template<class Scene>
-		void SetStartScene()
+		template<class Scene> void SetStartScene()
 		{
-			static_assert(std::is_base_of_v<alnyrScene, Scene>, "required : derived alnyrScene class.");
-			scene_manager_->SetScene(new Scene);
+			SetScene(new Scene);
 		}
+
+	private:
+		void SetScene(alnyrScene* scene);
 	};
 }

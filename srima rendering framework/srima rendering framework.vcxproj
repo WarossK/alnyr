@@ -85,6 +85,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)srima_src;$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -116,13 +117,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\srima_shader.h" />
-    <ClInclude Include="src\srima_window.h" />
+    <ClInclude Include="srima_src\srima_shader.h" />
+    <ClInclude Include="srima_src\srima_window.h" />
     <ClInclude Include="srima.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\srima.cpp" />
-    <ClCompile Include="src\srima_window.cpp" />
+    <ClCompile Include="srima_src\srima.cpp" />
+    <ClCompile Include="srima_src\srima_window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

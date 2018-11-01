@@ -10,7 +10,7 @@ namespace srima
 		class srimaShader
 		{
 		public:
-			bool Initialize(); 
+			
 		};
 	}
 }

@@ -8,6 +8,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kara phisycs framework", "kara phisycs framework\kara phisycs framework.vcxproj", "{5267BFBC-B7CC-4C39-9347-2B2FA5D91360}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "alnyr game engine", "alnyr game engine\alnyr game engine.vcxproj", "{A03981DA-1FB0-49F7-96EE-C429738FCDAC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5267BFBC-B7CC-4C39-9347-2B2FA5D91360} = {5267BFBC-B7CC-4C39-9347-2B2FA5D91360}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "1.alnyr_sample", "alnyr_sample\alnyr_sample.vcxproj", "{C4EFCF71-CF60-44C3-94F5-5A6D4EDAED32}"
 EndProject

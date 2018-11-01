@@ -1,17 +1,16 @@
-#include "../alnyr game engine/alnyr.hpp"
 #include <iostream>
+#include <Windows.h>
+#include <alnyr.hpp>
 
 int main(int, char**)
 {
 	auto engine = alnyr::CreateEngine();
 
-	srima::window::srimaSetAppActiveCallBack([] {std::cout << "app active." << std::endl; });
-	srima::window::srimaSetKeyInputCallBack([](LONG, WPARAM, LPARAM) {std::cout << "key callback." << std::endl; });
-	srima::window::srimaSetMouseInputCallBack([](LONG, WPARAM, LPARAM l) 
-	{ 
-		auto x = LOWORD(l);
-		auto y = HIWORD(l);
-		//std::cout << "mouse x : " << x << ", y : " << y << std::endl; 
+	alnyr::window::alnyrSetAppActiveCallBack([] { std::cout << "app active." << std::endl; });
+	alnyr::window::alnyrSetKeyInputCallBack([](LONG, WPARAM, LPARAM) { std::cout << "key callback." << std::endl; });
+	alnyr::window::alnyrSetMouseInputCallBack([](LONG, WPARAM, LPARAM l)
+	{
+		//std::cout << "mouse x : " << LOWORD(l) << ", y : " << HIWORD(l) << std::endl;
 	});
 
 	if (engine->Initialize())

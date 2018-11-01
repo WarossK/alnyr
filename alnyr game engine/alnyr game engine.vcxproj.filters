@@ -24,42 +24,45 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\alnyr_window.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="alnyr.hpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="src\alnyr_engine.h">
+    <ClInclude Include="alnyr_src\alnyr_engine.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="src\alnyr_util.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="src\alnyr_scene.h">
-      <Filter>ヘッダー ファイル\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="src\alnyr_scene_manager.h">
-      <Filter>ヘッダー ファイル\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="src\alnyr_object_behavior.h">
+    <ClInclude Include="alnyr_src\alnyr_game_object.h">
       <Filter>ヘッダー ファイル\game_object</Filter>
     </ClInclude>
-    <ClInclude Include="src\alnyr_game_object.h">
+    <ClInclude Include="alnyr_src\alnyr_object_behavior.h">
       <Filter>ヘッダー ファイル\game_object</Filter>
     </ClInclude>
-    <ClInclude Include="src\alnyr_resource_group.h">
+    <ClInclude Include="alnyr_src\alnyr_resource_group.h">
       <Filter>ヘッダー ファイル\resource</Filter>
+    </ClInclude>
+    <ClInclude Include="alnyr_src\alnyr_scene.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="alnyr_src\alnyr_scene_manager.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="alnyr_src\alnyr_util.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="alnyr_src\alnyr_window.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\alnyr_window.cpp">
+    <ClCompile Include="alnyr_src\alnyr.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="src\alnyr.cpp">
+    <ClCompile Include="alnyr_src\alnyr_engine.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="src\alnyr_engine.cpp">
+    <ClCompile Include="alnyr_src\alnyr_scene_manager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="alnyr_src\alnyr_window.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

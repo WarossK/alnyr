@@ -1,6 +1,7 @@
 #pragma once
 
-#include "src/alnyr_engine.h"
+#include <alnyr_src/alnyr_engine.h>
+#include <alnyr_src/alnyr_window.h>
 
 namespace alnyr
 {

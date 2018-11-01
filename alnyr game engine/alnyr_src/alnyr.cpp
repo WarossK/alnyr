@@ -1,11 +1,11 @@
-#include "..\alnyr.hpp"
+#include <../alnyr.hpp>
 #include <stdexcept>
 
 static alnyr::alnyrEngine* singleton = nullptr;
 
 alnyr::alnyrEngine * alnyr::CreateEngine()
 {
-	if (singleton) throw std::runtime_error("AlnyrEngine is singleton.");
+	if (singleton) throw std::runtime_error("alnyrEngine is singleton.");
 
 	singleton = new alnyrEngine();
 
@@ -14,7 +14,7 @@ alnyr::alnyrEngine * alnyr::CreateEngine()
 
 void alnyr::TerminateEngine()
 {
-	if(!singleton) throw std::runtime_error("AlnyrEngine is not created.");
+	if(!singleton) throw std::runtime_error("alnyrEngine is not created.");
 
 	singleton->Uninitialize();
 

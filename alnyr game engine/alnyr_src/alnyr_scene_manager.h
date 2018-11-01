@@ -1,10 +1,8 @@
 #pragma once
 
-#include <memory>
-#include "alnyr_scene.h"
-
 namespace alnyr
 {
+	class alnyrScene;
 	class alnyrSceneManager
 	{
 	private:
@@ -14,6 +12,7 @@ namespace alnyr
 	public:
 		bool SceneInitialize();
 		void SceneUpdate();
+		void SceneRender();
 		void SceneUninitialize();
 
 		void SetScene(alnyrScene* scene);
