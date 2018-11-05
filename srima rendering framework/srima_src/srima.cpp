@@ -8,6 +8,9 @@
 #include <algorithm>
 #include <iostream>
 #include <comdef.h>
+#include <filesystem>
+#include <mutex>
+#include <srima_src/srima_thread_pool.h>
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -33,12 +36,15 @@ struct Property
 	D3D12_VIEWPORT viewport;
 	D3D12_RECT scissor_rect;
 
+	std::mutex command_queue_mutex;
+
 	HANDLE event_handle;
 
 	unsigned int frame_index;
 	unsigned int rtv_descriptor_size;
 }*properties = nullptr;
 
+//AppWakeUpInitialize
 bool CreateDevice(const ComPtr<IDXGIFactory4>& factory)
 {
 	if (bool use_warp_device = false) //temporary.
@@ -70,7 +76,7 @@ bool CreateDevice(const ComPtr<IDXGIFactory4>& factory)
 
 bool CreateCommandQueue()
 {
-	D3D12_COMMAND_QUEUE_DESC	queue_desc = {};
+	D3D12_COMMAND_QUEUE_DESC queue_desc = {};
 	queue_desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 	queue_desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
@@ -81,6 +87,12 @@ bool CreateCommandQueue()
 
 bool CreateSwapChain(const ComPtr<IDXGIFactory4>& factory, srima::window::srimaWindow* window)
 {
+	{//set scissor-rect
+		long width = window->GetWidth();
+		long height = window->GetHeight();
+		properties->scissor_rect = { 0u, 0u, width, height };
+	}
+
 	DXGI_SWAP_CHAIN_DESC1 swapchain_desc = {};
 	swapchain_desc.BufferCount = kFrameCount;
 	swapchain_desc.Width = window->GetWidth();
@@ -90,7 +102,7 @@ bool CreateSwapChain(const ComPtr<IDXGIFactory4>& factory, srima::window::srimaW
 	swapchain_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	swapchain_desc.SampleDesc.Count = 1;
 
-	auto window_handle = reinterpret_cast<HWND>(window->GetHandle());
+	auto window_handle = window->GetHandle<HWND>();
 
 	ComPtr<IDXGISwapChain1>	swapchain;
 	if (FAILED(factory->CreateSwapChainForHwnd(
@@ -107,7 +119,7 @@ bool CreateSwapChain(const ComPtr<IDXGIFactory4>& factory, srima::window::srimaW
 	return true;
 }
 
-bool CreateDescriptorHeap()
+bool CreateRenderTargetViewDescriptorHeap()
 {
 	D3D12_DESCRIPTOR_HEAP_DESC rtv_heap_desc = {};
 	rtv_heap_desc.NumDescriptors = kFrameCount;
@@ -128,7 +140,7 @@ bool CreateFrameResource()
 	unsigned int i = 0u;
 	for (auto&& rt : properties->render_targets)
 	{
-		if (FAILED(properties->swapchain->GetBuffer(i, IID_PPV_ARGS(&rt)))) return false;
+		if (FAILED(properties->swapchain->GetBuffer(i++, IID_PPV_ARGS(&rt)))) return false;
 		properties->device->CreateRenderTargetView(rt.Get(), nullptr, rtv_handle);
 		rtv_handle.ptr += properties->rtv_descriptor_size;
 	}
@@ -142,20 +154,24 @@ bool CreateCommandAllocator()
 		D3D12_COMMAND_LIST_TYPE_DIRECT,
 		IID_PPV_ARGS(&properties->command_allocator)));
 }
+//End of AppWakeUpInitialize
 
-bool CreateRootSignature()
+//AssetsInitialize
+bool CreateEmptyRootSignature()
 {
 	D3D12_ROOT_SIGNATURE_DESC root_signature_desc;
-	root_signature_desc.NumParameters = 0;
-	root_signature_desc.pParameters = nullptr;
-	root_signature_desc.NumStaticSamplers = 0;
-	root_signature_desc.pStaticSamplers = nullptr;
+	SecureZeroMemory(&root_signature_desc, sizeof(root_signature_desc));
 	root_signature_desc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
 	ComPtr<ID3DBlob> signature;
 	ComPtr<ID3DBlob> error;
 
-	if (FAILED(D3D12SerializeRootSignature(&root_signature_desc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error))) return false;
+	if (FAILED(D3D12SerializeRootSignature(&root_signature_desc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error)))
+	{
+		std::cout << reinterpret_cast<const char*>(error->GetBufferPointer()) << std::endl;
+		return false;
+	}
+
 	if (FAILED(properties->device->CreateRootSignature(
 		0,
 		signature->GetBufferPointer(),
@@ -165,17 +181,64 @@ bool CreateRootSignature()
 	return true;
 }
 
+ComPtr<ID3DBlob> CompileShader(std::filesystem::path hlsl_path)
+{
+#if defined(_DEBUG)
+	// Enable better shader debugging with the graphics debugging tools.
+	UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+#else
+	UINT compileFlags = 0;
+#endif
+
+	ComPtr<ID3DBlob> shader;
+
+	if (FAILED(D3DCompileFromFile(hlsl_path.c_str(), nullptr, nullptr, "main", "vs_5_0", compileFlags, 0, &shader, nullptr)))
+	{
+		return ComPtr<ID3DBlob>(nullptr);
+	}
+
+	return shader;
+}
+
+ComPtr<ID3DBlob> LoadCompiledShader(std::filesystem::path cso_path)
+{
+	ComPtr<ID3DBlob> shader;
+	if (FAILED(D3DReadFileToBlob(cso_path.c_str(), shader.GetAddressOf())))
+	{
+		return ComPtr<ID3DBlob>(nullptr);
+	}
+
+	return shader;
+}
+
+bool CreateVertexInputLayout()
+{
+	//かんがえる
+	return true;
+}
+
+bool CreatePipelineStateObject(std::filesystem::path vertex_shader_path, std::filesystem::path pixel_shader_path)
+{
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC pso_desc = {};
+
+	return true;
+}
+
 bool CreateCommandList()
 {
-	return SUCCEEDED(properties->device->CreateCommandList(
+	if (FAILED(properties->device->CreateCommandList(
 		1,
 		D3D12_COMMAND_LIST_TYPE_DIRECT,
 		properties->command_allocator.Get(),
 		nullptr,
-		IID_PPV_ARGS(&properties->command_list)));
+		IID_PPV_ARGS(&properties->command_list))))
+	{
+		return false;
+	}
 
-	//IID_ID3D12GraphicsCommandList,
-	//reinterpret_cast<void**>(properties->command_list.GetAddressOf())));
+	properties->command_list->Close();
+
+	return true;
 }
 
 bool CreateFence()
@@ -186,12 +249,9 @@ bool CreateFence()
 		0,
 		D3D12_FENCE_FLAG_NONE,
 		IID_PPV_ARGS(&properties->fence)));
-
-	//IID_ID3D12Fence,
-	//reinterpret_cast<void**>(properties->fence.GetAddressOf())));
 }
 
-bool srima::d3d12::Initialize(srima::window::srimaWindow* window)
+bool srima::d3d12::InitializePipeline(srima::window::srimaWindow* window)
 {
 	if (properties) throw std::runtime_error("srima::d3d12::Initialize() >> d3d12 already initialized.");
 	properties = new Property();
@@ -209,18 +269,23 @@ bool srima::d3d12::Initialize(srima::window::srimaWindow* window)
 	ComPtr<IDXGIFactory4> factory;
 	if (FAILED(CreateDXGIFactory1(IID_PPV_ARGS(&factory)))) return false;
 
-	properties->viewport.Width = window->GetWidth();
-	properties->viewport.Height = window->GetHeight();
+	properties->viewport.TopLeftX = 0.0f;
+	properties->viewport.TopLeftY = 0.0f;
+	properties->viewport.Width = static_cast<float>(window->GetWidth());
+	properties->viewport.Height = static_cast<float>(window->GetHeight());
+	properties->viewport.MinDepth = 0.0f;
+	properties->viewport.MaxDepth = 1.0f;
 
 	std::vector<std::function<bool()>> initilize_list
 	{
 		std::bind(CreateDevice, factory)
 		,CreateCommandQueue
 		,std::bind(CreateSwapChain, factory, window)
-		,CreateDescriptorHeap
+		,CreateRenderTargetViewDescriptorHeap
 		,CreateFrameResource
 		,CreateCommandAllocator
-		,CreateRootSignature
+		//
+		,CreateEmptyRootSignature
 		,CreateCommandList
 		,CreateFence
 	};
@@ -231,69 +296,67 @@ bool srima::d3d12::Initialize(srima::window::srimaWindow* window)
 	});
 }
 
-void srima::d3d12::TestRender()
+void srima::d3d12::PopulateCommandList()
 {
-	auto resource_barrier = [](ID3D12GraphicsCommandList* pCmdList,
-							   ID3D12Resource* pResource,
-							   D3D12_RESOURCE_STATES stateBefore,
-							   D3D12_RESOURCE_STATES stateAfter)
-	{
-		D3D12_RESOURCE_BARRIER desc = {};
-		desc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		desc.Transition.pResource = pResource;
-		desc.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-		desc.Transition.StateBefore = stateBefore;
-		desc.Transition.StateAfter = stateAfter;
+	HRESULT result;
+	result = properties->command_allocator->Reset();
 
-		pCmdList->ResourceBarrier(1, &desc);
-	};
+	result = properties->command_list->Reset(properties->command_allocator.Get(), nullptr);
 
-	D3D12_CPU_DESCRIPTOR_HANDLE	rtv_handle = {};
-	rtv_handle.ptr =
-		properties->rtv_heap->GetCPUDescriptorHandleForHeapStart().ptr + properties->frame_index * properties->rtv_descriptor_size;
-	properties->command_list->OMSetRenderTargets(1, &rtv_handle, FALSE, nullptr);
-
+	//properties->command_list->SetGraphicsRootSignature(properties->root_signature.Get());
 	properties->command_list->RSSetViewports(1, &properties->viewport);
-	//リソースバリア
-	resource_barrier(
-		properties->command_list.Get()
-		, properties->render_targets[properties->frame_index].Get()
-		, D3D12_RESOURCE_STATES::D3D12_RESOURCE_STATE_PRESENT
-		, D3D12_RESOURCE_STATES::D3D12_RESOURCE_STATE_RENDER_TARGET);
+	properties->command_list->RSSetScissorRects(1, &properties->scissor_rect);
 
-	float clearColor[] = { 0.39f, 0.58f, 0.92f, 1.0f };
-	properties->command_list->ClearRenderTargetView(rtv_handle, clearColor, 1, &properties->scissor_rect);
-	//リソースバリア
-	resource_barrier(
-		properties->command_list.Get()
-		, properties->render_targets[properties->frame_index].Get()
-		, D3D12_RESOURCE_STATES::D3D12_RESOURCE_STATE_RENDER_TARGET
-		, D3D12_RESOURCE_STATES::D3D12_RESOURCE_STATE_PRESENT);
+	D3D12_RESOURCE_BARRIER barrier;
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier.Transition.pResource = properties->render_targets[properties->frame_index].Get();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
-	Present();
+	properties->command_list->ResourceBarrier(1, &barrier);
+
+	D3D12_CPU_DESCRIPTOR_HANDLE rtv_handle = properties->rtv_heap->GetCPUDescriptorHandleForHeapStart();
+	rtv_handle.ptr += (properties->rtv_descriptor_size * properties->frame_index);
+
+	properties->command_list->OMSetRenderTargets(1, &rtv_handle, false, nullptr);
+
+	const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
+	D3D12_RECT rect(properties->scissor_rect);//{ 100, 100, 400, 400 };
+	properties->command_list->ClearRenderTargetView(rtv_handle, clearColor, 1, &rect);
+
+	//ここにPSOが同一のオブジェクトごとにコマンドをPopulateする。
+
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+
+	properties->command_list->ResourceBarrier(1, &barrier);
+
+	result = properties->command_list->Close();
+
+	{//Excute
+		ID3D12CommandList* ppCommandLists[] = { properties->command_list.Get() };
+		properties->command_queue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
+
+		properties->swapchain->Present(1, 0);
+	}
 }
 
-void srima::d3d12::Present()
+void srima::d3d12::WaitNextFrame()
 {
-	properties->command_list->Close();
-	try
+	static uint64_t f = 0;
+	const uint64_t fence = f;
+	properties->command_queue->Signal(properties->fence.Get(), fence);
+	f++;
+
+	if (properties->fence->GetCompletedValue() < fence)
 	{
-		properties->command_queue->ExecuteCommandLists(1, reinterpret_cast<ID3D12CommandList**>(properties->command_list.GetAddressOf()));
-	}
-	catch (_com_error ce)
-	{
-		std::wcout << ce.ErrorMessage() << std::endl;
+		properties->fence->SetEventOnCompletion(fence, properties->event_handle);
+		WaitForSingleObject(properties->event_handle, INFINITE);
 	}
 
-	properties->fence->Signal(0);
-	properties->fence->SetEventOnCompletion(1, properties->event_handle);
-	properties->command_queue->Signal(properties->fence.Get(), 1);
-	WaitForSingleObject(properties->event_handle, INFINITE);
-
-	properties->swapchain->Present(0, 0);
-
-	properties->command_allocator->Reset();
-	properties->command_list->Reset(properties->command_allocator.Get(), nullptr);
+	properties->frame_index = properties->swapchain->GetCurrentBackBufferIndex();
 }
 
 void srima::d3d12::Uninitialize()

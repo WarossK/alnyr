@@ -22,6 +22,15 @@
     <Filter Include="ヘッダー ファイル\resource">
       <UniqueIdentifier>{b20f0980-dcb2-479a-9235-840f5e2deb2a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\behavior">
+      <UniqueIdentifier>{eebd1630-9eb7-44a8-8a08-549dd0a8076d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\util">
+      <UniqueIdentifier>{9e5ab1c1-0491-4f00-a34b-2b6811dff49c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\material">
+      <UniqueIdentifier>{96aeb8d1-5314-42d6-992a-11882e2cf505}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alnyr.hpp">
@@ -45,10 +54,37 @@
     <ClInclude Include="alnyr_src\alnyr_scene_manager.h">
       <Filter>ヘッダー ファイル\scene</Filter>
     </ClInclude>
-    <ClInclude Include="alnyr_src\alnyr_util.h">
+    <ClInclude Include="alnyr_src\alnyr_window.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="alnyr_src\alnyr_window.h">
+    <ClInclude Include="alnyr_src\alnyr_static_mesh.h">
+      <Filter>ヘッダー ファイル\resource</Filter>
+    </ClInclude>
+    <ClInclude Include="alnyr_src\alnyr_dynamic_mesh.h">
+      <Filter>ヘッダー ファイル\resource</Filter>
+    </ClInclude>
+    <ClInclude Include="alnyr_src\alnyr_util.h">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="alnyr_src\alnyr_material.h">
+      <Filter>ヘッダー ファイル\material</Filter>
+    </ClInclude>
+    <ClInclude Include="alnyr_src\alnyr_property.h">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="alnyr_src\alnyr_texture.h">
+      <Filter>ヘッダー ファイル\material</Filter>
+    </ClInclude>
+    <ClInclude Include="alnyr_src\alnyr_transform.h">
+      <Filter>ヘッダー ファイル\behavior</Filter>
+    </ClInclude>
+    <ClInclude Include="alnyr_src\alnyr_renderable_game_object.h">
+      <Filter>ヘッダー ファイル\game_object</Filter>
+    </ClInclude>
+    <ClInclude Include="alnyr_src\alnyr_camera.h">
+      <Filter>ヘッダー ファイル\game_object</Filter>
+    </ClInclude>
+    <ClInclude Include="alnyr_src\alnyr_math.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
@@ -65,5 +101,14 @@
     <ClCompile Include="alnyr_src\alnyr_window.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="alnyr_src\alnyr_game_object.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="alnyr_src\alnyr_scene.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

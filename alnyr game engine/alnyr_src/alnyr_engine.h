@@ -1,6 +1,8 @@
 #pragma once
 
+#include <functional>
 #include <type_traits>
+#include <alnyr_src/alnyr_scene_parameter.h>
 
 namespace srima { namespace window { class srimaWindow; } }
 namespace alnyr
@@ -25,12 +27,6 @@ namespace alnyr
 		void Run();
 		void Uninitialize();
 
-		template<class Scene> void SetStartScene()
-		{
-			SetScene(new Scene);
-		}
-
-	private:
-		void SetScene(alnyrScene* scene);
+		void SetStartScene(alnyrSceneParameter* scene_parameter);
 	};
 }

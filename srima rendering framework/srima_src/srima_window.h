@@ -18,6 +18,7 @@ namespace srima
 			virtual bool ProcessMessage() = 0;
 			virtual void Uninitialize() = 0;
 			void* GetHandle() { return handle_; }
+			template<class HandleType> HandleType GetHandle() { return reinterpret_cast<HandleType>(handle_); }
 			const unsigned int& GetWidth() { return width_; }
 			const unsigned int& GetHeight() { return height_; }
 		};

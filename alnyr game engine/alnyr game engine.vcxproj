@@ -84,7 +84,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)alnyr_src;$(SolutionDir)srima rendering framework;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(CTTI_DIR);$(ProjectDir);$(ProjectDir)alnyr_src;$(SolutionDir)srima rendering framework;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -118,18 +118,29 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="alnyr.hpp" />
+    <ClInclude Include="alnyr_src\alnyr_material.h" />
+    <ClInclude Include="alnyr_src\alnyr_math.h" />
+    <ClInclude Include="alnyr_src\alnyr_property.h" />
+    <ClInclude Include="alnyr_src\alnyr_dynamic_mesh.h" />
     <ClInclude Include="alnyr_src\alnyr_object_behavior.h" />
     <ClInclude Include="alnyr_src\alnyr_game_object.h" />
     <ClInclude Include="alnyr_src\alnyr_resource_group.h" />
     <ClInclude Include="alnyr_src\alnyr_scene.h" />
     <ClInclude Include="alnyr_src\alnyr_scene_manager.h" />
+    <ClInclude Include="alnyr_src\alnyr_static_mesh.h" />
     <ClInclude Include="alnyr_src\alnyr_util.h" />
     <ClInclude Include="alnyr_src\alnyr_engine.h" />
     <ClInclude Include="alnyr_src\alnyr_window.h" />
+    <ClInclude Include="alnyr_src\alnyr_texture.h" />
+    <ClInclude Include="alnyr_src\alnyr_transform.h" />
+    <ClInclude Include="alnyr_src\alnyr_renderable_game_object.h" />
+    <ClInclude Include="alnyr_src\alnyr_camera.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="alnyr_src\alnyr.cpp" />
     <ClCompile Include="alnyr_src\alnyr_engine.cpp" />
+    <ClCompile Include="alnyr_src\alnyr_game_object.cpp" />
+    <ClCompile Include="alnyr_src\alnyr_scene.cpp" />
     <ClCompile Include="alnyr_src\alnyr_scene_manager.cpp" />
     <ClCompile Include="alnyr_src\alnyr_window.cpp" />
   </ItemGroup>
@@ -138,7 +149,17 @@
       <Project>{2435b528-461b-41c0-8433-99c852808bcf}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\directxtk12_desktop_2015.2018.10.31.1\build\native\directxtk12_desktop_2015.targets" Condition="Exists('..\packages\directxtk12_desktop_2015.2018.10.31.1\build\native\directxtk12_desktop_2015.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>このプロジェクトは、このコンピューター上にない NuGet パッケージを参照しています。それらのパッケージをダウンロードするには、[NuGet パッケージの復元] を使用します。詳細については、http://go.microsoft.com/fwlink/?LinkID=322105 を参照してください。見つからないファイルは {0} です。</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\directxtk12_desktop_2015.2018.10.31.1\build\native\directxtk12_desktop_2015.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk12_desktop_2015.2018.10.31.1\build\native\directxtk12_desktop_2015.targets'))" />
+  </Target>
 </Project>

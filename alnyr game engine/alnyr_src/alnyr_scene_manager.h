@@ -6,6 +6,8 @@ namespace alnyr
 	class alnyrSceneManager
 	{
 	private:
+		alnyrScene* load_scene_;
+
 		alnyrScene* current_scene_;
 		alnyrScene* next_scene_;
 

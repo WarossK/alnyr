@@ -8,9 +8,11 @@ namespace srima
 
 	namespace d3d12
 	{
-		bool Initialize(srima::window::srimaWindow* window);
-		void TestRender();
-		void Present();
+		bool InitializePipeline(srima::window::srimaWindow* window);
+
+		void PopulateCommandList();
+		void WaitNextFrame();
+
 		void Uninitialize();
 	}
 }

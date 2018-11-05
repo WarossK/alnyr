@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <alnyr_texture.h>
 
 namespace alnyr
 {
@@ -11,7 +12,7 @@ namespace alnyr
 
 	private:
 		std::vector<alnyrTexture> textures_;
-		std::vector<alnyrMesh> meshes_;
+		//std::vector<alnyrMesh> meshes_;
 		//アニメーション
 		//サウンド
 		//(エフェクト)
@@ -22,13 +23,13 @@ namespace alnyr
 		~alnyrResourceGroup() {}
 
 		void SetTextureResourceArray(const std::vector<alnyrTexture>& resource_array);
-		void SetMeshResourceArray(const std::vector<alnyrMesh>& resource_array);
+		//void SetMeshResourceArray(const std::vector<alnyrMesh>& resource_array);
 		//void SetAnimationResourceArray(const std::vector<alnyrAnimation>& resource_array);
 		//void SetSoundResourceArray(const std::vector<alnyrSound>& resource_array);
 		//void SetEffectResourceArray(const std::vector<alnyrEffect>& resource_array);
 
 		void AddTextureResource(const alnyrTexture&& resource);//move
-		void AddMeshResource(const alnyrMesh&& resource);//move
+		//void AddMeshResource(const alnyrMesh&& resource);//move
 		//void AddAnimationResource();
 		//void AddSoundResource();
 		//void AddEffectResource();

@@ -7,7 +7,7 @@ bool alnyr::alnyrEngine::Initialize()
 {
 	window_ = srima::window::srimaCreateWindow("alnyr", 1280u, 720u);
 
-	if (!srima::d3d12::Initialize(window_)) return false;
+	if (!srima::d3d12::InitializePipeline(window_)) return false;
 
 	return true;
 }
@@ -18,7 +18,8 @@ void alnyr::alnyrEngine::Run()
 	{
 		scene_manager_->SceneUpdate();
 		scene_manager_->SceneRender();
-		srima::d3d12::TestRender();
+		srima::d3d12::PopulateCommandList();
+		srima::d3d12::WaitNextFrame();
 	}
 }
 
@@ -28,7 +29,8 @@ void alnyr::alnyrEngine::Uninitialize()
 	srima::window::srimaTerminateWindow(window_);
 }
 
-void alnyr::alnyrEngine::SetScene(alnyrScene* scene)
+void alnyr::alnyrEngine::SetStartScene(alnyrSceneParameter* scene_parameter)
 {
-	scene_manager_->SetScene(scene);
+	if(!scene_parameter) throw std::runtime_error("scene parameter is nullptr.");
+	scene_manager_->SetScene(new alnyrScene(scene_parameter));
 }
