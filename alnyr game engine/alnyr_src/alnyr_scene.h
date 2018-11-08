@@ -2,31 +2,32 @@
 
 #include <vector>
 #include <functional>
-#include <alnyr_game_object.h>
+#include <alnyr_src/alnyr_game_object.h>
+#include <alnyr_src/alnyr_resource_group.h>
 
 namespace alnyr
 {
-	class alnyrResourceGroup;
-	class alnyrSceneParameter;
 	class alnyrScene
 	{
 		friend class alnyrSceneManager;
 	private:
 		std::vector<alnyrGameObject*> objects_;
 		std::list<alnyrGameObject*> destroyed_objects_;
-		alnyrSceneParameter* scene_param;
+		alnyrResourceGroup* resource_group_;
 
-		void SceneInitialize(std::function<void(alnyrScene*)> initialize_descriptor = [](alnyrScene*) {});
-		void SceneUninitialize(std::function<void(alnyrScene*)> uninitialize_descriptor = [](alnyrScene*) {});
+		virtual void SceneInitialize() = 0;
+		virtual void SceneUninitialize() = 0;
 
 		void ObjectInitialize();
 		void ObjectUpdate();
 		void ObjectUninitialize();
 
-		alnyrResourceGroup* GetResources(alnyrResourceGroup* new_resources);
+		alnyrResourceGroup* GetResources(alnyrResourceGroup* new_resources = nullptr);
 
 	public:
-		alnyrScene(alnyrSceneParameter* scene_param) : scene_param(scene_param) {}
+		alnyrScene(alnyrResourceGroup* resource_group) : resource_group_(resource_group) {}
+
+		alnyrResourceGroup* GetResourceGroup() { return resource_group_; }
 
 		template<class ObjectType, class...ObjectArgs> alnyrGameObject* AddGameObject(ObjectArgs...args)
 		{

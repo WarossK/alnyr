@@ -1,9 +1,21 @@
 #include <alnyr_scene_manager.h>
 #include <alnyr_scene.h>
 
-bool alnyr::alnyrSceneManager::SceneInitialize()
+static alnyr::alnyrSceneManager* manager = nullptr;
+
+alnyr::alnyrSceneManager::alnyrSceneManager()
 {
-	return false;
+	manager = this;
+}
+
+alnyr::alnyrSceneManager::~alnyrSceneManager()
+{
+	manager = nullptr;
+}
+
+void alnyr::alnyrSceneManager::SceneInitialize()
+{
+	;
 }
 
 void alnyr::alnyrSceneManager::SceneUpdate()
@@ -18,7 +30,12 @@ void alnyr::alnyrSceneManager::SceneUninitialize()
 {
 }
 
-void alnyr::alnyrSceneManager::SetScene(alnyrScene * scene)
+void alnyr::alnyrSceneManager::SetScene(alnyrScene* scene)
 {
 	current_scene_ = scene;
+}
+
+void alnyr::alnyrSceneManager::SceneChange()
+{
+	//manager->;
 }

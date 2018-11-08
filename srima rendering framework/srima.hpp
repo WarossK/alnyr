@@ -2,17 +2,15 @@
 
 #include <srima_src/srima_window.h>
 
+#define SRIMA_ULTIMATE_BETAGAKI
+
+//current : single threaded. 
+
 namespace srima
 {
-	namespace vulkan {} //reserve
+	bool Initialize(srima::window::srimaWindow* window);
 
-	namespace d3d12
-	{
-		bool InitializePipeline(srima::window::srimaWindow* window);
+	void Present();
 
-		void PopulateCommandList();
-		void WaitNextFrame();
-
-		void Uninitialize();
-	}
+	void Uninitialize();
 }

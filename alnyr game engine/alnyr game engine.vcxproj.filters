@@ -31,6 +31,9 @@
     <Filter Include="ヘッダー ファイル\material">
       <UniqueIdentifier>{96aeb8d1-5314-42d6-992a-11882e2cf505}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\renderer">
+      <UniqueIdentifier>{82b595a1-aa2f-4809-bb05-9fbf88829a22}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alnyr.hpp">
@@ -84,6 +87,24 @@
     <ClInclude Include="alnyr_src\alnyr_camera.h">
       <Filter>ヘッダー ファイル\game_object</Filter>
     </ClInclude>
+    <ClInclude Include="alnyr_src\alnyr_scene_parameter.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="alnyr_src\alnyr_renderer.h">
+      <Filter>ヘッダー ファイル\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="alnyr_src\alnyr_mesh_renderer.h">
+      <Filter>ヘッダー ファイル\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="alnyr_src\alnyr_billboard_renderer.h">
+      <Filter>ヘッダー ファイル\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="alnyr_src\alnyr_sprite_renderer.h">
+      <Filter>ヘッダー ファイル\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="alnyr_src\alnyr_scene_factory.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
     <ClInclude Include="alnyr_src\alnyr_math.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -105,6 +126,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="alnyr_src\alnyr_scene.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="alnyr_src\alnyr_static_mesh.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

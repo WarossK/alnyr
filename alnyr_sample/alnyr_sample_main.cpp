@@ -1,8 +1,9 @@
 #include <iostream>
+#include <memory>
 #include <Windows.h>
 #include <d3d12.h>
 #include <alnyr.hpp>
-#include <alnyr_src/alnyr_scene_parameter.h>
+#include "alnyr_sample_scene.h"
 
 int main(int, char**)
 {
@@ -15,14 +16,9 @@ int main(int, char**)
 		//std::cout << "mouse x : " << LOWORD(l) << ", y : " << HIWORD(l) << std::endl;
 	});
 
-	alnyr::alnyrSceneParameter param;
-	param.initialize = [](alnyr::alnyrScene*) {};
-	param.uninitialize = [](alnyr::alnyrScene*) {};
-	param.resource_group = nullptr;
-
 	if (engine->Initialize())
 	{
-		engine->SetStartScene(&param);
+		engine->SetStartScene(new SampleScene);
 		engine->Run();
 	}
 

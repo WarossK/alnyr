@@ -2,14 +2,12 @@
 
 #include <functional>
 #include <type_traits>
-#include <alnyr_src/alnyr_scene_parameter.h>
 
 namespace srima { namespace window { class srimaWindow; } }
 namespace alnyr
 {
 	class alnyrScene;
 	class alnyrSceneManager;
-
 	class alnyrEngine
 	{
 		friend alnyrEngine* CreateEngine();
@@ -27,6 +25,7 @@ namespace alnyr
 		void Run();
 		void Uninitialize();
 
-		void SetStartScene(alnyrSceneParameter* scene_parameter);
+		//内部でポインタをreleaseします。
+		void SetStartScene(alnyrScene* scene);
 	};
 }

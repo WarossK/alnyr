@@ -2,14 +2,19 @@
 
 #include <vector>
 #include <filesystem>
-#include <alnyr_math.h>
+#include <alnyr_src/alnyr_math.h>
 
-class alnyrStaticMesh
+namespace alnyr
 {
-private:
-	std::vector<Vector3> vertices_;
+	class alnyrStaticMesh
+	{
+	private:
+		std::vector<Vector3> vertices_;
 
-public:
-	bool Initialize(const std::vector<Vector3>& vertices);
-	bool Initialize(std::filesystem::path model_path);
-};
+	public:
+		alnyrStaticMesh() { vertices_.clear(); }
+		bool Initialize(const std::vector<Vector3>& vertices);
+		//bool Initialize(const std::vector<srimaVertex3D>& vertices);
+		bool Initialize(std::filesystem::path model_path);
+	};
+}

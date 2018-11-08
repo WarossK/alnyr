@@ -1,17 +1,5 @@
 #include "alnyr_scene.h"
 #include <alnyr_camera.h>
-#include <alnyr_scene_parameter.h>
-
-void alnyr::alnyrScene::SceneInitialize(std::function<void(alnyrScene*)> initialize_descriptor)
-{
-	AddGameObject<alnyrCamera>();
-	initialize_descriptor(this);
-}
-
-void alnyr::alnyrScene::SceneUninitialize(std::function<void(alnyrScene*)> uninitialize_descriptor)
-{
-	uninitialize_descriptor(this);
-}
 
 void alnyr::alnyrScene::ObjectInitialize()
 {
@@ -34,6 +22,7 @@ void alnyr::alnyrScene::ObjectUpdate()
 		}
 	}
 
+	//中間elementをeraseするのが嫌なので一番後ろのオブジェクトがdestroyedの時のみ削除する。
 	while (bool check = true)
 	{
 		check = false;
@@ -61,10 +50,10 @@ void alnyr::alnyrScene::ObjectUninitialize()
 
 alnyr::alnyrResourceGroup * alnyr::alnyrScene::GetResources(alnyrResourceGroup * new_resources)
 {
-	if (!new_resources) return scene_param->resource_group;
+	if (!new_resources) return resource_group_;
 
-	delete scene_param->resource_group;
-	scene_param->resource_group = nullptr;
+	delete resource_group_;
+	resource_group_ = nullptr;
 
 	return new_resources;
 }

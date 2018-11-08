@@ -1,8 +1,12 @@
 #pragma once
 
+#include <memory>
+
 namespace alnyr
 {
 	class alnyrScene;
+	class alnyrEngine;
+	
 	class alnyrSceneManager
 	{
 	private:
@@ -12,11 +16,15 @@ namespace alnyr
 		alnyrScene* next_scene_;
 
 	public:
-		bool SceneInitialize();
+		alnyrSceneManager();
+		~alnyrSceneManager();
+		void SceneInitialize();
 		void SceneUpdate();
 		void SceneRender();
 		void SceneUninitialize();
 
 		void SetScene(alnyrScene* scene);
+
+		static void SceneChange();
 	};
 }

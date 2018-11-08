@@ -118,15 +118,20 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="alnyr.hpp" />
+    <ClInclude Include="alnyr_src\alnyr_billboard_renderer.h" />
     <ClInclude Include="alnyr_src\alnyr_material.h" />
     <ClInclude Include="alnyr_src\alnyr_math.h" />
+    <ClInclude Include="alnyr_src\alnyr_mesh_renderer.h" />
     <ClInclude Include="alnyr_src\alnyr_property.h" />
     <ClInclude Include="alnyr_src\alnyr_dynamic_mesh.h" />
     <ClInclude Include="alnyr_src\alnyr_object_behavior.h" />
     <ClInclude Include="alnyr_src\alnyr_game_object.h" />
     <ClInclude Include="alnyr_src\alnyr_resource_group.h" />
     <ClInclude Include="alnyr_src\alnyr_scene.h" />
+    <ClInclude Include="alnyr_src\alnyr_scene_factory.h" />
+    <ClInclude Include="alnyr_src\alnyr_scene_parameter.h" />
     <ClInclude Include="alnyr_src\alnyr_scene_manager.h" />
+    <ClInclude Include="alnyr_src\alnyr_sprite_renderer.h" />
     <ClInclude Include="alnyr_src\alnyr_static_mesh.h" />
     <ClInclude Include="alnyr_src\alnyr_util.h" />
     <ClInclude Include="alnyr_src\alnyr_engine.h" />
@@ -135,6 +140,7 @@
     <ClInclude Include="alnyr_src\alnyr_transform.h" />
     <ClInclude Include="alnyr_src\alnyr_renderable_game_object.h" />
     <ClInclude Include="alnyr_src\alnyr_camera.h" />
+    <ClInclude Include="alnyr_src\alnyr_renderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="alnyr_src\alnyr.cpp" />
@@ -142,6 +148,7 @@
     <ClCompile Include="alnyr_src\alnyr_game_object.cpp" />
     <ClCompile Include="alnyr_src\alnyr_scene.cpp" />
     <ClCompile Include="alnyr_src\alnyr_scene_manager.cpp" />
+    <ClCompile Include="alnyr_src\alnyr_static_mesh.cpp" />
     <ClCompile Include="alnyr_src\alnyr_window.cpp" />
   </ItemGroup>
   <ItemGroup>

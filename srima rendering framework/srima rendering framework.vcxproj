@@ -117,15 +117,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="srima_src\srima_render_asset.h" />
-    <ClInclude Include="srima_src\srima_thread_pool.h" />
-    <ClInclude Include="srima_src\srima_shader.h" />
+    <ClInclude Include="srima_src\srima_render_pipeline.h" />
+    <ClInclude Include="srima_src\srima_shader_pipeline.h" />
     <ClInclude Include="srima_src\srima_window.h" />
     <ClInclude Include="srima.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="srima_src\srima_thread_pool.cpp" />
     <ClCompile Include="srima_src\srima.cpp" />
+    <ClCompile Include="srima_src\srima_render_pipeline.cpp" />
     <ClCompile Include="srima_src\srima_window.cpp" />
   </ItemGroup>
   <ItemGroup>
