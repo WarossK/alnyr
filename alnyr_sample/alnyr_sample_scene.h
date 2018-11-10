@@ -1,7 +1,7 @@
 #pragma once
 
 #include <alnyr_src/alnyr_scene.h>
-#include <alnyr_src/alnyr_math.h>
+#include <alnyr_math.h>
 
 class SampleScene : public alnyr::alnyrScene
 {

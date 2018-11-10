@@ -85,7 +85,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)srima_src;$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)alnyr utility(bridge);$(ProjectDir)srima_src;$(ProjectDir);$(CTTI_DIR);$(SolutionDir)alnyr rendering destination</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -118,26 +118,36 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="srima_src\srima_render_pipeline.h" />
-    <ClInclude Include="srima_src\srima_shader_pipeline.h" />
-    <ClInclude Include="srima_src\srima_window.h" />
+    <ClInclude Include="srima_src\srima_shader_asset.h" />
     <ClInclude Include="srima.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="srima_src\srima.cpp" />
     <ClCompile Include="srima_src\srima_render_pipeline.cpp" />
-    <ClCompile Include="srima_src\srima_window.cpp" />
+    <ClCompile Include="srima_src\srima_shader_asset.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\alnyr rendering destination\alnyr rendering destination.vcxproj">
+      <Project>{c2d19989-904e-4d8d-bc96-5c655f409233}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\directxtk12_desktop_2015.2018.10.31.1\build\native\directxtk12_desktop_2015.targets" Condition="Exists('..\packages\directxtk12_desktop_2015.2018.10.31.1\build\native\directxtk12_desktop_2015.targets')" />
+    <Import Project="..\packages\lua51.redist.5.1.5\build\native\lua51.redist.targets" Condition="Exists('..\packages\lua51.redist.5.1.5\build\native\lua51.redist.targets')" />
+    <Import Project="..\packages\lua51.5.1.5\build\native\lua51.targets" Condition="Exists('..\packages\lua51.5.1.5\build\native\lua51.targets')" />
+    <Import Project="..\packages\luabind.0.7.1\build\native\luabind.targets" Condition="Exists('..\packages\luabind.0.7.1\build\native\luabind.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>このプロジェクトは、このコンピューター上にない NuGet パッケージを参照しています。それらのパッケージをダウンロードするには、[NuGet パッケージの復元] を使用します。詳細については、http://go.microsoft.com/fwlink/?LinkID=322105 を参照してください。見つからないファイルは {0} です。</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\directxtk12_desktop_2015.2018.10.31.1\build\native\directxtk12_desktop_2015.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk12_desktop_2015.2018.10.31.1\build\native\directxtk12_desktop_2015.targets'))" />
+    <Error Condition="!Exists('..\packages\lua51.redist.5.1.5\build\native\lua51.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\lua51.redist.5.1.5\build\native\lua51.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\lua51.5.1.5\build\native\lua51.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\lua51.5.1.5\build\native\lua51.targets'))" />
+    <Error Condition="!Exists('..\packages\luabind.0.7.1\build\native\luabind.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\luabind.0.7.1\build\native\luabind.targets'))" />
   </Target>
 </Project>

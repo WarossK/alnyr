@@ -5,6 +5,7 @@ void alnyr::alnyrScene::ObjectInitialize()
 {
 	for (auto&& object : objects_)
 	{
+		if (object->IsBringNextScene()) continue;
 		object->BehaviorInitialize();
 	}
 }
@@ -44,16 +45,7 @@ void alnyr::alnyrScene::ObjectUninitialize()
 {
 	for (auto&& object : objects_)
 	{
+		if (object->IsBringNextScene()) continue;
 		object->BehaviorUninitialize();
 	}
-}
-
-alnyr::alnyrResourceGroup * alnyr::alnyrScene::GetResources(alnyrResourceGroup * new_resources)
-{
-	if (!new_resources) return resource_group_;
-
-	delete resource_group_;
-	resource_group_ = nullptr;
-
-	return new_resources;
 }

@@ -12,7 +12,7 @@ alnyr::alnyrEngine * alnyr::CreateEngine()
 	return singleton;
 }
 
-void alnyr::TerminateEngine()
+void alnyr::TerminateEngine(alnyrEngine** engine)
 {
 	if(!singleton) throw std::runtime_error("alnyrEngine is not created.");
 
@@ -20,4 +20,5 @@ void alnyr::TerminateEngine()
 
 	delete singleton;
 	singleton = nullptr;
+	(*engine) = nullptr;
 }

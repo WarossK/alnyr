@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <mutex>
 #include <srima_window.h>
+#include <functional>
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -47,6 +48,13 @@ struct UltimateProperty
 
 std::unique_ptr<UltimateProperty> properties;
 
+std::function<void(std::string_view)> message_callback = [](std::string_view) {};
+
+void srima::SetInitializeTimeCallBack(std::function<void(std::string_view)> callback)
+{
+	message_callback = callback;
+}
+
 //AppWakeUpInitialize
 bool CreateDevice(const ComPtr<IDXGIFactory4>& factory)
 {
@@ -61,7 +69,7 @@ bool CreateDevice(const ComPtr<IDXGIFactory4>& factory)
 		ComPtr<IDXGIAdapter1> hardware_adapter(nullptr);
 		ComPtr<IDXGIAdapter1> adapter;
 
-		for (UINT i = 0; DXGI_ERROR_NOT_FOUND != factory->EnumAdapters1(i, &adapter); i++)
+		for (uint32_t i = 0; DXGI_ERROR_NOT_FOUND != factory->EnumAdapters1(i, &adapter); i++)
 		{
 			DXGI_ADAPTER_DESC1 adapter_desc;
 			adapter->GetDesc1(&adapter_desc);
@@ -74,6 +82,7 @@ bool CreateDevice(const ComPtr<IDXGIFactory4>& factory)
 
 		if (FAILED(D3D12CreateDevice(hardware_adapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&properties->device)))) return false;
 	}
+	message_callback("D3D12 : device created.");
 	return true;
 }
 
@@ -85,6 +94,7 @@ bool CreateCommandQueue()
 
 	if (FAILED(properties->device->CreateCommandQueue(&queue_desc, IID_PPV_ARGS(&properties->command_queue)))) return false;
 
+	message_callback("D3D12 : command queue created.");
 	return true;
 }
 
@@ -119,6 +129,7 @@ bool CreateSwapChain(const ComPtr<IDXGIFactory4>& factory, srima::window::srimaW
 	if (FAILED(swapchain.As(&properties->swapchain))) return false;
 	properties->frame_index = properties->swapchain->GetCurrentBackBufferIndex();
 
+	message_callback("D3D12 : swapchain created.");
 	return true;
 }
 
@@ -132,6 +143,7 @@ bool CreateRenderTargetViewDescriptorHeap()
 
 	properties->rtv_descriptor_size = properties->device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
+	message_callback("D3D12 : render target view descriptor heap created.");
 	return true;
 }
 
@@ -148,14 +160,21 @@ bool CreateFrameResource()
 		rtv_handle.ptr += properties->rtv_descriptor_size;
 	}
 
+	message_callback("D3D12 : frame resource created.");
 	return true;
 }
 
 bool CreateCommandAllocator()
 {
-	return SUCCEEDED(properties->device->CreateCommandAllocator(
+	if (FAILED(properties->device->CreateCommandAllocator(
 		D3D12_COMMAND_LIST_TYPE_DIRECT,
-		IID_PPV_ARGS(&properties->command_allocator)));
+		IID_PPV_ARGS(&properties->command_allocator))))
+	{
+		return false;
+	}
+
+	message_callback("D3D12 : command allocator created.");
+	return true;
 }
 //End of AppWakeUpInitialize
 
@@ -217,10 +236,10 @@ ComPtr<ID3DBlob> LoadCompiledShader(std::filesystem::path cso_path)
 
 std::vector<D3D12_INPUT_ELEMENT_DESC> CreateVertexInputLayout()
 {
-	std::vector < D3D12_INPUT_ELEMENT_DESC>	input_element_descs
+	std::vector<D3D12_INPUT_ELEMENT_DESC> input_element_descs
 	{
-				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0,  0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-				{"TEXCOORD",    0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0,  0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT,    0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 	};
 	return input_element_descs;
 }
@@ -304,17 +323,17 @@ bool CreateVertexBuffer()
 	struct vvv
 	{
 		DirectX::XMFLOAT3 pos;
-		DirectX::XMFLOAT2 uv;
+		DirectX::XMFLOAT4 color;
 	};
 
 	vvv triangleVertices[] =
 	{
-		{{-0.25f,  0.25f, 0.0f}, {0.0f, 0.0f}},
-		{{ 0.25f,  0.25f, 0.0f}, {1.0f, 0.0f}},
-		{{ 0.25f, -0.25f, 0.0f}, {1.0f, 1.0f}},
-		{{-0.25f,  0.25f, 0.0f}, {0.0f, 0.0f}},
-		{{ 0.25f, -0.25f, 0.0f}, {1.0f, 1.0f}},
-		{{-0.25f, -0.25f, 0.0f}, {0.0f, 1.0f}},
+		{DirectX::XMFLOAT3{-0.25f,  0.25f, 0.0f}, DirectX::XMFLOAT4{1.0f, 1.0f, 1.0f, 1.0f }},
+		{DirectX::XMFLOAT3{ 0.25f,  0.25f, 0.0f}, DirectX::XMFLOAT4{1.0f, 1.0f, 1.0f, 1.0f }},
+		{DirectX::XMFLOAT3{ 0.25f, -0.25f, 0.0f}, DirectX::XMFLOAT4{1.0f, 1.0f, 1.0f, 1.0f }},
+		{DirectX::XMFLOAT3{-0.25f,  0.25f, 0.0f}, DirectX::XMFLOAT4{1.0f, 1.0f, 1.0f, 1.0f }},
+		{DirectX::XMFLOAT3{ 0.25f, -0.25f, 0.0f}, DirectX::XMFLOAT4{1.0f, 1.0f, 1.0f, 1.0f }},
+		{DirectX::XMFLOAT3{-0.25f, -0.25f, 0.0f}, DirectX::XMFLOAT4{1.0f, 1.0f, 1.0f, 1.0f }},
 	};
 
 	const uint32_t vertexBufferSize = sizeof(triangleVertices);
@@ -330,7 +349,7 @@ bool CreateVertexBuffer()
 		D3D12_RESOURCE_DESC resourceDesc = {};
 		resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 		resourceDesc.Alignment = 0;
-		resourceDesc.Width = vertexBufferSize;
+		resourceDesc.Width = vertexBufferSize;//kore
 		resourceDesc.Height = 1;
 		resourceDesc.DepthOrArraySize = 1;
 		resourceDesc.MipLevels = 1;
@@ -362,6 +381,62 @@ bool CreateVertexBuffer()
 	WaitForPreviousFrame();
 
 	return TRUE;
+}
+
+std::pair<ComPtr<ID3D12Resource>, D3D12_VERTEX_BUFFER_VIEW> CreateVertexBufferEX(void* ptr, size_t per_vertex, size_t length)
+{
+	std::pair<ComPtr<ID3D12Resource>, D3D12_VERTEX_BUFFER_VIEW> result;
+
+	const uint32_t vertexBufferSize = per_vertex * length;
+
+	{
+		D3D12_HEAP_PROPERTIES heapProperties = {};
+		heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
+		heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+		heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+		heapProperties.CreationNodeMask = 1;
+		heapProperties.VisibleNodeMask = 1;
+
+		D3D12_RESOURCE_DESC resourceDesc = {};
+		resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		resourceDesc.Alignment = 0;
+		resourceDesc.Width = vertexBufferSize;
+		resourceDesc.Height = 1;
+		resourceDesc.DepthOrArraySize = 1;
+		resourceDesc.MipLevels = 1;
+		resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+		resourceDesc.SampleDesc.Count = 1;
+		resourceDesc.SampleDesc.Quality = 0;
+		resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+		resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+		if (FAILED(properties->device->CreateCommittedResource(
+			&heapProperties,
+			D3D12_HEAP_FLAG_NONE,
+			&resourceDesc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(&result.first)))) throw std::runtime_error("vertex buffer create failure.");
+	}
+
+	uint8_t* vertex_data_begin;
+	D3D12_RANGE	readRange = { 0, 0 };
+	if (FAILED(result.first->Map(0, &readRange, reinterpret_cast<void**>(&vertex_data_begin))))
+	{
+		throw std::runtime_error("vertex buffer create failure.");
+	}
+	memcpy(vertex_data_begin, ptr, vertexBufferSize);
+	result.first->Unmap(0, nullptr);
+
+
+	D3D12_VERTEX_BUFFER_VIEW vbv;
+	vbv.BufferLocation = result.first->GetGPUVirtualAddress();
+	vbv.StrideInBytes = per_vertex;
+	vbv.SizeInBytes = vertexBufferSize;
+
+	WaitForPreviousFrame();
+
+	return result;
 }
 
 bool CreateCommandList()
@@ -445,7 +520,7 @@ void PopulateCommandList()
 
 	result = properties->command_list->Reset(properties->command_allocator.Get(), properties->pipeline_state.Get());
 
-	//properties->command_list->SetGraphicsRootSignature(properties->root_signature.Get());
+	properties->command_list->SetGraphicsRootSignature(properties->root_signature.Get());
 	properties->command_list->RSSetViewports(1, &properties->viewport);
 	properties->command_list->RSSetScissorRects(1, &properties->scissor_rect);
 
@@ -471,7 +546,7 @@ void PopulateCommandList()
 	{//ここにPSOが同一のオブジェクトごとにコマンドをPopulateする。
 		properties->command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		properties->command_list->IASetVertexBuffers(0, 1, &properties->vertex_buffer_view);
-		properties->command_list->DrawInstanced(6, 2, 0, 0);
+		properties->command_list->DrawInstanced(6, 1, 0, 0);
 	}
 
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -498,8 +573,13 @@ void WaitForPreviousFrame()
 
 	if (properties->fence->GetCompletedValue() < fence)
 	{
+		message_callback("いえ～いｗｗｗｗｗｗｗｗｗｗｗｗ");
 		properties->fence->SetEventOnCompletion(fence, properties->event_handle);
 		WaitForSingleObject(properties->event_handle, INFINITE);
+	}
+	else
+	{
+		message_callback("しゅん...");
 	}
 
 	properties->frame_index = properties->swapchain->GetCurrentBackBufferIndex();

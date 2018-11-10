@@ -5,6 +5,7 @@ static alnyr::alnyrSceneManager* manager = nullptr;
 
 alnyr::alnyrSceneManager::alnyrSceneManager()
 {
+	if (manager) throw std::runtime_error("scene manager is already created.");
 	manager = this;
 }
 
@@ -15,27 +16,40 @@ alnyr::alnyrSceneManager::~alnyrSceneManager()
 
 void alnyr::alnyrSceneManager::SceneInitialize()
 {
-	;
+	current_scene_->ObjectInitialize();
 }
 
 void alnyr::alnyrSceneManager::SceneUpdate()
 {
+	current_scene_->ObjectUpdate();
 }
 
 void alnyr::alnyrSceneManager::SceneRender()
 {
+	current_scene_->GetResourceGroup();//todo
 }
 
 void alnyr::alnyrSceneManager::SceneUninitialize()
 {
+	current_scene_->ObjectUninitialize();
 }
 
-void alnyr::alnyrSceneManager::SetScene(alnyrScene* scene)
+void alnyr::alnyrSceneManager::LoadNextSceneResource(std::function<bool(const std::unique_ptr<alnyrResourceGroup>&)> next_resource_group)
 {
-	current_scene_ = scene;
+	auto rg = std::make_unique<alnyrResourceGroup>();
+	manager->is_load_complete_ = manager->load_thread_.Enqueue(next_resource_group, rg);
+
+
 }
 
-void alnyr::alnyrSceneManager::SceneChange()
+void alnyr::alnyrSceneManager::LoadNextSceneResourceAndSetObject(std::function<bool(alnyrScene*)> next_scene)
 {
-	//manager->;
+	auto next = new alnyrScene;
+	next->SetResourceGroup(std::forward<std::unique_ptr<alnyrResourceGroup>>(std::make_unique<alnyrResourceGroup>()));
+	manager->is_load_complete_ = manager->load_thread_.Enqueue(next_scene, next);
+
+}
+
+void alnyr::alnyrSceneManager::LoadLoadingSceneResourceAndSetObject(std::function<bool(alnyrScene*)> next_scene)
+{
 }

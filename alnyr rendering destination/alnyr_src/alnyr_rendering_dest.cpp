@@ -1,43 +1,45 @@
-#include "srima_window.h"
+#include "../alnyr_rendering_dest.h"
+#include <Windows.h>
 
-struct WindowsWindow : srima::window::srimaWindow
+class Window : public alnyr::alnyrRenderingDest
 {
+private:
 	MSG window_message_;
-	bool ProcessMessage() override;
-	void Uninitialize() override;
 
 public:
-	WindowsWindow(HWND window_handle, unsigned int width, unsigned int height)
+	Window(void* handle, uint32_t width, uint32_t height)
 	{
-		handle_ = window_handle;
+		handle_ = handle;
 		width_ = width;
 		height_ = height;
 		SecureZeroMemory(&window_message_, sizeof(MSG));
 	}
+	virtual bool ProcessMessage() override;
+	virtual void Uninitialize() override;
 };
 
-LRESULT __stdcall WindowProc(HWND window_handle, UINT message, WPARAM wparam, LPARAM lparam);
+std::function<void(uint32_t, uint64_t, int64_t)> callback = [](uint32_t, uint64_t, int64_t) {};
 
-std::function<void()> app_active = [] {};
-std::function<void(UINT, WPARAM, LPARAM)> key_input = [](UINT, WPARAM, LPARAM) {};
-std::function<void(UINT, WPARAM, LPARAM)> mouse_input = [](UINT, WPARAM, LPARAM) {};
-
-void srima::window::srimaSetAppActiveCallBack(std::function<void()> app_active_callback)
+LRESULT __stdcall WindowProc(HWND window_handle, UINT message, WPARAM wparam, LPARAM lparam)
 {
-	app_active = app_active_callback;
+	switch (message)
+	{
+	case WM_CLOSE:
+		PostQuitMessage(0);
+		break;
+	default:
+		callback(message, wparam, lparam);
+	}
+
+	return DefWindowProc(window_handle, message, wparam, lparam);
 }
 
-void srima::window::srimaSetKeyInputCallBack(std::function<void(UINT, WPARAM, LPARAM)> key_input_callback)
+void alnyr::alnyrSetProcessMessageCallBack(std::function<void(uint32_t, uint64_t, int64_t)> message_process_callback)
 {
-	key_input = key_input_callback;
+	callback = message_process_callback;
 }
 
-void srima::window::srimaSetMouseInputCallBack(std::function<void(UINT, WPARAM, LPARAM)> mouse_input_callback)
-{
-	mouse_input = mouse_input_callback;
-}
-
-srima::window::srimaWindow* srima::window::srimaCreateWindow(const char * title, unsigned int width, unsigned int height)
+alnyr::alnyrRenderingDest * alnyr::alnyrCreateWindow(const char * title, unsigned int width, unsigned int height)
 {
 	WNDCLASSEX window_class;
 
@@ -96,47 +98,24 @@ srima::window::srimaWindow* srima::window::srimaCreateWindow(const char * title,
 	SetForegroundWindow(window_handle);
 	SetFocus(window_handle);
 
-	return new WindowsWindow(window_handle, width, height);
+	return new Window(window_handle, width, height);
 }
 
-LRESULT __stdcall WindowProc(HWND window_handle, UINT message, WPARAM wparam, LPARAM lparam)
+alnyr::alnyrRenderingDest * alnyr::alnyrCreateOtherWindow(const char * title, unsigned int width, unsigned int height)
 {
-	switch (message)
-	{
-	case WM_ACTIVATEAPP:
-		app_active();
-		break;
-	case WM_INPUT:
-	case WM_MOUSEMOVE:
-	case WM_LBUTTONDOWN:
-	case WM_LBUTTONUP:
-	case WM_RBUTTONDOWN:
-	case WM_RBUTTONUP:
-	case WM_MBUTTONDOWN:
-	case WM_MBUTTONUP:
-	case WM_MOUSEWHEEL:
-	case WM_XBUTTONDOWN:
-	case WM_XBUTTONUP:
-	case WM_MOUSEHOVER:
-		mouse_input(message, wparam, lparam);
-		break;
-	case WM_KEYDOWN:
-	case WM_SYSKEYDOWN:
-	case WM_KEYUP:
-	case WM_SYSKEYUP:
-		key_input(message, wparam, lparam);
-		break;
-	case WM_CLOSE:
-		PostQuitMessage(0);
-		break;
-	default:
-		return DefWindowProc(window_handle, message, wparam, lparam);
-	}
-
-	return 0;
+	return nullptr;
 }
 
-bool WindowsWindow::ProcessMessage()
+void alnyr::alnyrTerminateWindow(alnyrRenderingDest** window)
+{
+	auto& window_ptr = *window;
+
+	window_ptr->Uninitialize();
+	delete window_ptr;
+	window_ptr = nullptr;
+}
+
+bool Window::ProcessMessage()
 {
 	while (PeekMessage(&window_message_, nullptr, 0U, 0U, PM_REMOVE))
 	{
@@ -149,13 +128,8 @@ bool WindowsWindow::ProcessMessage()
 	return true;
 }
 
-void WindowsWindow::Uninitialize()
+void Window::Uninitialize()
 {
 	PostQuitMessage(0);
 	DestroyWindow(reinterpret_cast<HWND>(GetHandle()));
-}
-
-void srima::window::srimaTerminateWindow(srimaWindow* window)
-{
-	window->Uninitialize();
 }

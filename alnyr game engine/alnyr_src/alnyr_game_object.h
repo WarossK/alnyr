@@ -3,6 +3,8 @@
 #include <vector>
 #include <unordered_map>
 #include <type_id.hpp>
+#include <boost/container/flat_map.hpp>
+#include <alnyr_src/alnyr_util.h>
 
 namespace alnyr
 {
@@ -10,14 +12,16 @@ namespace alnyr
 	class alnyrGameObject
 	{
 	private:
-		std::unordered_map<ctti::type_index, alnyrObjectBehavior*> object_behaviors_;
+		boost::container::flat_map<ctti::type_index, alnyrObjectBehavior*, util::alnyr_less<ctti::type_index>> object_behaviors_;
 
 		alnyrGameObject* parent_;
 		std::vector<alnyrGameObject*> children_;
 
 		bool is_destroy_;
+		bool is_bring_scene_change_;
 
 	public:
+		alnyrGameObject(uint32_t behavior_capacity = 32u);
 		void BehaviorInitialize();
 		void BehaviorUpdate();
 		void BehaviorUninitialize();
@@ -25,17 +29,21 @@ namespace alnyr
 		void SetParent(alnyrGameObject* parent);
 		alnyrGameObject* GetParent();
 		void AddChild(alnyrGameObject* child);
-		void RemoveChild(alnyrGameObject* child);
+		void RemoveChild(alnyrGameObject* child); //removeしたオブジェクトにchildの所有権を渡す。
 
 		void Destroy();
 		const bool& IsDestroyed();
 
+		void BringNextScene(bool bringing = true);
+		const bool& IsBringNextScene();
+
 		template<class BehaviorType, class...BehaviorArgs> BehaviorType* AddBehavior(BehaviorArgs... args)
 		{
-			if(object_behaviors_.count(ctti::type_id<BehaviorType>())) throw std::runtime_error("behavior is found. already added.");
+			if (object_behaviors_.count(ctti::type_id<BehaviorType>())) throw std::runtime_error("behavior is found. already added.");
 			return static_cast<BehaviorType*>(object_behaviors_[ctti::type_id<BehaviorType>()] = new BehaviorType(this, args...));
 		}
 
+		//クッソ遅いので最初にキャッシュしてほしい
 		template<class BehaviorType> BehaviorType* GetBehavior()
 		{
 			if (!object_behaviors_.count(ctti::type_id<BehaviorType>())) throw std::runtime_error("behavior is not find.");

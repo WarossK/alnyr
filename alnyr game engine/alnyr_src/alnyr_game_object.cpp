@@ -1,6 +1,14 @@
 #include "alnyr_game_object.h"
 #include <alnyr_object_behavior.h>
 
+alnyr::alnyrGameObject::alnyrGameObject(uint32_t behavior_capacity) :
+	is_destroy_(false)
+	, is_bring_scene_change_(false)
+{
+	auto cap = behavior_capacity ? behavior_capacity : std::numeric_limits<uint32_t>::max();
+	object_behaviors_.reserve(cap);
+}
+
 void alnyr::alnyrGameObject::BehaviorInitialize()
 {
 	for (auto&&[type_index, behavior] : object_behaviors_)
@@ -75,4 +83,14 @@ void alnyr::alnyrGameObject::Destroy()
 const bool & alnyr::alnyrGameObject::IsDestroyed()
 {
 	return is_destroy_;
+}
+
+void alnyr::alnyrGameObject::BringNextScene(bool bringing)
+{
+	is_bring_scene_change_ = bringing;
+}
+
+const bool & alnyr::alnyrGameObject::IsBringNextScene()
+{
+	return is_bring_scene_change_;
 }

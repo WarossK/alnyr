@@ -13,21 +13,18 @@ namespace alnyr
 	private:
 		std::vector<alnyrGameObject*> objects_;
 		std::list<alnyrGameObject*> destroyed_objects_;
-		alnyrResourceGroup* resource_group_;
-
-		virtual void SceneInitialize() = 0;
-		virtual void SceneUninitialize() = 0;
+		std::unique_ptr<alnyrResourceGroup> resource_group_;
 
 		void ObjectInitialize();
 		void ObjectUpdate();
 		void ObjectUninitialize();
 
-		alnyrResourceGroup* GetResources(alnyrResourceGroup* new_resources = nullptr);
-
 	public:
-		alnyrScene(alnyrResourceGroup* resource_group) : resource_group_(resource_group) {}
+		alnyrScene() {}
+		~alnyrScene() {}
 
-		alnyrResourceGroup* GetResourceGroup() { return resource_group_; }
+		void SetResourceGroup(std::unique_ptr<alnyrResourceGroup>&& resource_group) { resource_group_ = std::move(resource_group); }
+		const std::unique_ptr<alnyrResourceGroup>& GetResourceGroup() { return resource_group_; }
 
 		template<class ObjectType, class...ObjectArgs> alnyrGameObject* AddGameObject(ObjectArgs...args)
 		{

@@ -5,7 +5,7 @@
 
 bool alnyr::alnyrEngine::Initialize()
 {
-	window_ = srima::window::srimaCreateWindow("alnyr", 1280u, 720u);
+	window_ = alnyrCreateWindow("alnyr", 1280u, 720u);
 	scene_manager_ = new alnyrSceneManager;
 
 	if (!srima::Initialize(window_)) return false;
@@ -20,15 +20,16 @@ void alnyr::alnyrEngine::Run()
 		scene_manager_->SceneUpdate();
 		scene_manager_->SceneRender();
 
-		srima::Present();
+		srima::Execute();
 	}
 }
 
 void alnyr::alnyrEngine::Uninitialize()
 {
 	delete scene_manager_;
+	scene_manager_ = nullptr;
 	srima::Uninitialize();
-	srima::window::srimaTerminateWindow(window_);
+	alnyrTerminateWindow(&window_);
 }
 
 void alnyr::alnyrEngine::SetStartScene(alnyrScene* scene)

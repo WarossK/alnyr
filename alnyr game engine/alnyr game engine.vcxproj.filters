@@ -57,9 +57,6 @@
     <ClInclude Include="alnyr_src\alnyr_scene_manager.h">
       <Filter>ヘッダー ファイル\scene</Filter>
     </ClInclude>
-    <ClInclude Include="alnyr_src\alnyr_window.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="alnyr_src\alnyr_static_mesh.h">
       <Filter>ヘッダー ファイル\resource</Filter>
     </ClInclude>
@@ -105,9 +102,6 @@
     <ClInclude Include="alnyr_src\alnyr_scene_factory.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="alnyr_src\alnyr_math.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="alnyr_src\alnyr.cpp">
@@ -117,9 +111,6 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="alnyr_src\alnyr_scene_manager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="alnyr_src\alnyr_window.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="alnyr_src\alnyr_game_object.cpp">

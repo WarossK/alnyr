@@ -2,8 +2,8 @@
 
 #include <functional>
 #include <type_traits>
+#include <alnyr_rendering_dest.h>
 
-namespace srima { namespace window { class srimaWindow; } }
 namespace alnyr
 {
 	class alnyrScene;
@@ -11,13 +11,13 @@ namespace alnyr
 	class alnyrEngine
 	{
 		friend alnyrEngine* CreateEngine();
-		friend void TerminateEngine();
+		friend void TerminateEngine(alnyrEngine**);
 	private:
-		srima::window::srimaWindow* window_;
+		alnyr::alnyrRenderingDest* window_;
 		alnyrSceneManager* scene_manager_;
 
 	private:
-		alnyrEngine() {}
+		alnyrEngine() : window_(nullptr), scene_manager_(nullptr) {}
 		~alnyrEngine() {}
 
 	public:
@@ -25,7 +25,12 @@ namespace alnyr
 		void Run();
 		void Uninitialize();
 
-		//内部でポインタをreleaseします。
+		template<class Scene> void SetStartScene()
+		{
+			SetStartScene(new Scene);
+		}
+
+	private:
 		void SetStartScene(alnyrScene* scene);
 	};
 }

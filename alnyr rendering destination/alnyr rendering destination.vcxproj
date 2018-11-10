@@ -20,10 +20,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{C4EFCF71-CF60-44C3-94F5-5A6D4EDAED32}</ProjectGuid>
-    <RootNamespace>alnyrsample</RootNamespace>
+    <ProjectGuid>{C2D19989-904E-4D8D-BC96-5C655F409233}</ProjectGuid>
+    <RootNamespace>alnyrrenderingdestination</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
-    <ProjectName>1.alnyr_sample</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -40,7 +39,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -71,7 +70,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
@@ -79,14 +78,12 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)alnyr utility(bridge);$(SolutionDir)alnyr rendering destination;$(SolutionDir)srima rendering framework;$(SolutionDir)alnyr game engine;$(CTTI_DIR);$(BOOST_1_68_0_DIR)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -118,33 +115,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="alnyr_sample_main.cpp" />
+    <ClInclude Include="alnyr_rendering_dest.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\alnyr game engine\alnyr game engine.vcxproj">
-      <Project>{a03981da-1fb0-49f7-96ee-c429738fcdac}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="alnyr_sample_scene.h" />
+    <ClCompile Include="alnyr_src\alnyr_rendering_dest.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\directxtk12_desktop_2015.2018.10.31.1\build\native\directxtk12_desktop_2015.targets" Condition="Exists('..\packages\directxtk12_desktop_2015.2018.10.31.1\build\native\directxtk12_desktop_2015.targets')" />
-    <Import Project="..\packages\lua51.redist.5.1.5\build\native\lua51.redist.targets" Condition="Exists('..\packages\lua51.redist.5.1.5\build\native\lua51.redist.targets')" />
-    <Import Project="..\packages\lua51.5.1.5\build\native\lua51.targets" Condition="Exists('..\packages\lua51.5.1.5\build\native\lua51.targets')" />
-    <Import Project="..\packages\luabind.0.7.1\build\native\luabind.targets" Condition="Exists('..\packages\luabind.0.7.1\build\native\luabind.targets')" />
   </ImportGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>このプロジェクトは、このコンピューター上にない NuGet パッケージを参照しています。それらのパッケージをダウンロードするには、[NuGet パッケージの復元] を使用します。詳細については、http://go.microsoft.com/fwlink/?LinkID=322105 を参照してください。見つからないファイルは {0} です。</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\directxtk12_desktop_2015.2018.10.31.1\build\native\directxtk12_desktop_2015.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk12_desktop_2015.2018.10.31.1\build\native\directxtk12_desktop_2015.targets'))" />
-    <Error Condition="!Exists('..\packages\lua51.redist.5.1.5\build\native\lua51.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\lua51.redist.5.1.5\build\native\lua51.redist.targets'))" />
-    <Error Condition="!Exists('..\packages\lua51.5.1.5\build\native\lua51.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\lua51.5.1.5\build\native\lua51.targets'))" />
-    <Error Condition="!Exists('..\packages\luabind.0.7.1\build\native\luabind.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\luabind.0.7.1\build\native\luabind.targets'))" />
-  </Target>
 </Project>
