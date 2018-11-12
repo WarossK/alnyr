@@ -35,9 +35,9 @@ namespace
 		ComPtr<ID3D12Fence> fence;
 		HANDLE event_handle;
 
-		ComPtr<ID3D12RootSignature> root_signature;
-		ComPtr<ID3D12PipelineState> pipeline_state;
-		ComPtr<ID3D12Resource> vertex_buffer;
+		//ComPtr<ID3D12RootSignature> root_signature;
+		//ComPtr<ID3D12PipelineState> pipeline_state;
+		//ComPtr<ID3D12Resource> vertex_buffer;
 
 		unsigned int frame_index;
 		unsigned int rtv_descriptor_size;
@@ -156,7 +156,7 @@ void CreateFrameResource()
 
 void CreateCommandAllocator()
 {
-	if(FAILED(d3d12->device->CreateCommandAllocator(
+	if (FAILED(d3d12->device->CreateCommandAllocator(
 		D3D12_COMMAND_LIST_TYPE_DIRECT,
 		IID_PPV_ARGS(&d3d12->command_allocator))))
 		throw std::runtime_error("command allocator create failure.");
@@ -183,7 +183,7 @@ void CreateFence()
 {
 	d3d12->event_handle = CreateEvent(0, FALSE, FALSE, 0);
 
-	if(FAILED(d3d12->device->CreateFence(
+	if (FAILED(d3d12->device->CreateFence(
 		0,
 		D3D12_FENCE_FLAG_NONE,
 		IID_PPV_ARGS(&d3d12->fence))))
@@ -224,12 +224,12 @@ bool srima::Initialize(alnyr::alnyrRenderingDest * rendering_dest)
 	d3d12->viewport.MinDepth = 0.0f;
 	d3d12->viewport.MaxDepth = 1.0f;
 
-	try{//Initialize
+	try {//Initialize
 		CreateDevice(factory);
 		debug_callback_message("device create.");
 		CreateCommandQueue();
 		debug_callback_message("command queue create.");
-		CreateSwapChain(factory,rendering_dest);
+		CreateSwapChain(factory, rendering_dest);
 		debug_callback_message("swapchain create.");
 		CreateRenderTargetViewDescriptorHeap();
 		debug_callback_message("RTV descriptor heap create.");
@@ -284,7 +284,7 @@ void srima::Execute()
 
 	d3d12->command_list->OMSetRenderTargets(1, &rtv_handle, false, nullptr);
 
-	const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
+	const float clearColor[] = { 0.7f, 1.0f, 0.1f, 1.0f };
 	d3d12->command_list->ClearRenderTargetView(rtv_handle, clearColor, 0u, nullptr);
 
 	{//ここにPSOが同一のオブジェクトごとにコマンドをPopulateする。
@@ -417,8 +417,9 @@ void srima::SetVertexBuffers(const srimaVertexBuffer& vertex_buffer)
 	d3d12->command_list->IASetVertexBuffers(0u, static_cast<uint32_t>(vertex_buffer_view.size()), vertex_buffer_view.data());
 }
 
-void srima::Draw()
+void srima::Draw(uint32_t vertex_count)
 {
+	d3d12->command_list->DrawInstanced(vertex_count, 1u, 0u, 0u);
 }
 
 //Minimum Implementation

@@ -39,5 +39,5 @@ namespace srima
 	void SetVertexBuffers(const srimaVertexBuffer& vertex_buffer);
 
 	//Draw Functions
-	void Draw();
+	void Draw(uint32_t vertex_count);
 }

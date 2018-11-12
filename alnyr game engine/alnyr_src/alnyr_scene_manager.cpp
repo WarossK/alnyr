@@ -21,6 +21,18 @@ alnyr::alnyrSceneManager::alnyrSceneManager() : fade_frame_(0u)
 alnyr::alnyrSceneManager::~alnyrSceneManager()
 {
 	manager = nullptr;
+
+	current_scene_->ObjectUninitialize();
+	delete current_scene_;
+	current_scene_ = nullptr;
+
+	if (next_scene_)
+	{
+		next_scene_->ObjectUninitialize();
+		delete next_scene_;
+		next_scene_ = nullptr;
+	}
+
 	delete load_scene_;
 	load_scene_ = nullptr;
 }
