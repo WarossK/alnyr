@@ -13,6 +13,7 @@ using namespace glm;
 using Vector2 = vec2;
 using Vector3 = vec3;
 using Vector4 = vec4;
+using Quaternion = vec4;
 using Matrix = mat4x4;
 
 #endif

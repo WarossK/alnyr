@@ -1,5 +1,6 @@
 #include <alnyr.hpp>
 #include "alnyr_sample_scene.h"
+#include <iostream>
 
 int main(int, char**)
 {

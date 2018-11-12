@@ -24,7 +24,7 @@ void alnyr::alnyrScene::ObjectUpdate()
 	}
 
 	//中間elementをeraseするのが嫌なので一番後ろのオブジェクトがdestroyedの時のみ削除する。
-	while (bool check = true)
+	for (bool check = true; check;)
 	{
 		check = false;
 		for (auto&& destroyed_object : destroyed_objects_)
@@ -48,4 +48,9 @@ void alnyr::alnyrScene::ObjectUninitialize()
 		if (object->IsBringNextScene()) continue;
 		object->BehaviorUninitialize();
 	}
+}
+
+void alnyr::alnyrScene::RenderExecute()
+{
+	resource_group_->Draw();
 }

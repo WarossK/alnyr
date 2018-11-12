@@ -1,8 +1,9 @@
 #pragma once
 
-#include <vector>
-#include <unordered_map>
 #include <string>
+#include <vector>
+#include <filesystem>
+#include <unordered_map>
 #include <alnyr_src/alnyr_texture.h>
 #include <alnyr_src/alnyr_static_mesh.h>
 #include <alnyr_src/alnyr_dynamic_mesh.h>
@@ -34,11 +35,13 @@ namespace alnyr
 		//void SetSoundResourceArray(const std::vector<alnyrSound>& resource_array);
 		//void SetEffectResourceArray(const std::vector<alnyrEffect>& resource_array);
 
-		void AddTextureResource(const alnyrTexture&& resource);//move
-		void AddMeshResource(const alnyrStaticMesh&& resource) {};//move
+		void AddTextureResource(std::filesystem::path path);
+		void AddMeshResource(std::filesystem::path path);
 		//void AddAnimationResource();
 		//void AddSoundResource();
 		//void AddEffectResource();
+
+		void Draw(){}
 	};
 
 }

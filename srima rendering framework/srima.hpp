@@ -3,11 +3,15 @@
 #include <alnyr_math.h>
 #include <alnyr_rendering_dest.h>
 
+#include <srima_src/srima_vertex_buffer.h>
+
 #define SRIMA_D3D12
 
 #if defined(SRIMA_D3D12)
 #include <d3d12.h>
-using srimaVertexBuffer = D3D12_VERTEX_BUFFER_VIEW;
+#include <wrl/client.h>
+using srimaGraphicsPipelineStateDesc = D3D12_GRAPHICS_PIPELINE_STATE_DESC;
+using srimaGraphicsPipelineState = Microsoft::WRL::ComPtr<ID3D12PipelineState>;
 
 #elif defined(SRIMA_VULKAN)
 #include <vulkan.hpp>
@@ -27,10 +31,12 @@ namespace srima
 	void SetDebugCallback(std::function<void(std::string_view)> callback);
 
 	//Create Functions
-	srimaVertexBuffer CreateVertexBuffer(void* vertices_start_ptr, uint32_t vertex_size, uint32_t vertex_array_size);
+	srimaVertexBuffer CreateVertexBuffer(void* vertices_start_ptr, uint32_t vertex_size, uint32_t vertex_array_size);//インスタンシングしない前提で作っとる
+	srimaVertexBuffer CreateInstancingVertexBuffer(uint32_t view_num, void** vertices_start_ptr, uint32_t* vertex_size, uint32_t* vertex_array_size);
+	srimaGraphicsPipelineState CreatePipeline(srimaGraphicsPipelineStateDesc* pipeline_state_desc);//デカすぎてキレイにラップできねぇ・・・
 
 	//Set Functions
-	void SetVertexBuffer();
+	void SetVertexBuffers(const srimaVertexBuffer& vertex_buffer);
 
 	//Draw Functions
 	void Draw();

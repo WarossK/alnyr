@@ -19,12 +19,20 @@ namespace alnyr
 		void ObjectUpdate();
 		void ObjectUninitialize();
 
-	public:
-		alnyrScene() {}
-		~alnyrScene() {}
-
 		void SetResourceGroup(std::unique_ptr<alnyrResourceGroup>&& resource_group) { resource_group_ = std::move(resource_group); }
 		const std::unique_ptr<alnyrResourceGroup>& GetResourceGroup() { return resource_group_; }
+
+		virtual void ResourceLoad(const std::unique_ptr<alnyrResourceGroup>& resource_group) = 0;
+		virtual void Initialize() = 0;
+
+	public:
+		alnyrScene() : resource_group_(std::make_unique<alnyrResourceGroup>()) {}
+		alnyrScene(std::unique_ptr<alnyrResourceGroup>&& resource_group) : resource_group_(std::move(resource_group)) {}
+		virtual ~alnyrScene() {}
+
+		void CallResouceLoad() { ResourceLoad(resource_group_); }
+		virtual void CallInitialize() { Initialize(); };
+		void RenderExecute();
 
 		template<class ObjectType, class...ObjectArgs> alnyrGameObject* AddGameObject(ObjectArgs...args)
 		{

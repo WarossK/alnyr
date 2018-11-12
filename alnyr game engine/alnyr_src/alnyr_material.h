@@ -6,7 +6,7 @@
 
 namespace alnyr
 {
-	struct alnyrMaterial : alnyrObjectBehavior
+	struct alnyrMaterial : public alnyrObjectBehavior
 	{
 		alnyrGameObject const* game_object;
 		Color diffuse;

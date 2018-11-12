@@ -117,14 +117,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="srima_src\srima_render_pipeline.h" />
-    <ClInclude Include="srima_src\srima_shader_asset.h" />
     <ClInclude Include="srima.hpp" />
+    <ClInclude Include="srima_src\srima_vertex_buffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="srima_src\srima.cpp" />
-    <ClCompile Include="srima_src\srima_render_pipeline.cpp" />
-    <ClCompile Include="srima_src\srima_shader_asset.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

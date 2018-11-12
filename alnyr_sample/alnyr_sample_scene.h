@@ -2,26 +2,17 @@
 
 #include <alnyr_src/alnyr_scene.h>
 #include <alnyr_math.h>
+#include <alnyr_src/alnyr_resource_group.h>
 
 class SampleScene : public alnyr::alnyrScene
 {
-public:
-	SampleScene() :
-		alnyrScene(new alnyr::alnyrResourceGroup)
+	void ResourceLoad(const std::unique_ptr<alnyr::alnyrResourceGroup>& resources) override
 	{
-		alnyr::alnyrStaticMesh static_mesh;
-		std::vector<Vector3> vertices
-		{
-			Vector3(-1.0f, 1.0f, 0.0f),
-			Vector3(1.0f, 1.0f, 0.0f),
-			Vector3(-1.0f, -1.0f, 0.0f),
-			Vector3(1.0f, -1.0f, 0.0f)
-		};
-		static_mesh.Initialize(vertices);
 
-		GetResourceGroup()->AddMeshResource(std::move(static_mesh));
 	}
 
-	void SceneInitialize(){}
-	void SceneUninitialize(){}
+	void Initialize() override
+	{
+
+	}
 };

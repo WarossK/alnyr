@@ -5,7 +5,7 @@
 
 namespace alnyr
 {
-	struct alnyrTransform : alnyrObjectBehavior
+	struct alnyrTransform : public alnyrObjectBehavior
 	{
 		Vector3 position;
 		Vector3 scale;

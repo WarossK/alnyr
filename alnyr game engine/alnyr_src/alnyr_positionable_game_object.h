@@ -6,22 +6,19 @@
 
 namespace alnyr
 {
-	class alnyrRenderableGameObject : public alnyrGameObject
+	class alnyrPositionableGameObject : public alnyrGameObject
 	{
 	private:
 		alnyrTransform* transform_;
-		alnyrMaterial* material_;
 
 	public:
-		alnyrRenderableGameObject()
+		alnyrPositionableGameObject()
 		{
 			transform_ = AddBehavior<alnyrTransform>();
-			material_ = AddBehavior<alnyrMaterial>();
 		}
 
-		virtual ~alnyrRenderableGameObject() {}
+		virtual ~alnyrPositionableGameObject() {}
 
 		alnyrTransform* GetTransform() { return transform_; }
-		alnyrMaterial* GetMaterial() { return material_; }
 	};
 }

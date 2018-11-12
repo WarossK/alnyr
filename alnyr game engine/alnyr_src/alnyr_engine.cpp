@@ -35,5 +35,7 @@ void alnyr::alnyrEngine::Uninitialize()
 void alnyr::alnyrEngine::SetStartScene(alnyrScene* scene)
 {
 	if (!scene) throw std::runtime_error("scene is nullptr.");
-	scene_manager_->SetScene(scene);
+	LoadNextSceneResource(scene);
+	SceneChange(0u, 0u);
+	scene_manager_->SceneUpdate();
 }

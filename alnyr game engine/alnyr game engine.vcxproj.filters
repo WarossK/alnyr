@@ -102,6 +102,18 @@
     <ClInclude Include="alnyr_src\alnyr_scene_factory.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="alnyr_src\alnyr_mesh_resource.h">
+      <Filter>ヘッダー ファイル\resource</Filter>
+    </ClInclude>
+    <ClInclude Include="alnyr_src\alnyr_thread_pool.h">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="alnyr_src\alnyr_state_manager.h">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="alnyr_src\alnyr_positionable_game_object.h">
+      <Filter>ヘッダー ファイル\game_object</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="alnyr_src\alnyr.cpp">

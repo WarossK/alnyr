@@ -1,7 +1,6 @@
 #pragma once
 
-#include <d3d12.h>
-#include <wrl/client.h>
+#include <srima_src/srima_vertex_buffer.h>
 
 namespace alnyr
 {
@@ -9,8 +8,7 @@ namespace alnyr
 	{
 	protected:
 		std::string pipeline_name_;
-		Microsoft::WRL::ComPtr<ID3D12Resource> vertex_buffer_;
-		D3D12_VERTEX_BUFFER_VIEW vertex_buffer_view_;
+		srima::srimaVertexBuffer vertex_buffer_;
 
 	public:
 		void SetPipelineName(std::string pipeline_name)
@@ -23,9 +21,9 @@ namespace alnyr
 			return pipeline_name_;
 		}
 
-		const D3D12_VERTEX_BUFFER_VIEW& GetVertexBufferView() const
+		const srima::srimaVertexBuffer& GetVertexBuffer() const
 		{
-			return vertex_buffer_view_;
+			return vertex_buffer_;
 		}
 	};
 }

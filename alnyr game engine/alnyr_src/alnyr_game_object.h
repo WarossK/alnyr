@@ -22,6 +22,7 @@ namespace alnyr
 
 	public:
 		alnyrGameObject(uint32_t behavior_capacity = 32u);
+		virtual ~alnyrGameObject() {}
 		void BehaviorInitialize();
 		void BehaviorUpdate();
 		void BehaviorUninitialize();
