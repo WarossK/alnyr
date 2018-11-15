@@ -46,8 +46,13 @@ void alnyr::alnyrScene::ObjectUninitialize()
 	for (auto&& object : objects_)
 	{
 		if (object->IsBringNextScene()) continue;
+
 		object->BehaviorUninitialize();
+		delete object;
+		object = nullptr;
 	}
+
+	objects_.clear();
 }
 
 void alnyr::alnyrScene::RenderExecute()

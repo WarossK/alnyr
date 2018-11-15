@@ -40,6 +40,8 @@ void alnyr::alnyrGameObject::BehaviorUninitialize()
 	for (auto&&[type_index, behavior] : object_behaviors_)
 	{
 		behavior->Uninitialize();
+		delete behavior;
+		behavior = nullptr;
 	}
 
 	for (auto&& child : children_)

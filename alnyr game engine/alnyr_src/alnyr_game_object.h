@@ -44,7 +44,7 @@ namespace alnyr
 			return static_cast<BehaviorType*>(object_behaviors_[ctti::type_id<BehaviorType>()] = new BehaviorType(this, args...));
 		}
 
-		//クッソ遅いので最初にキャッシュしてほしい
+		//クッソ遅いのでオブジェクトのイニシャライズでキャッシュしてほしい
 		template<class BehaviorType> BehaviorType* GetBehavior()
 		{
 			if (!object_behaviors_.count(ctti::type_id<BehaviorType>())) throw std::runtime_error("behavior is not find.");
