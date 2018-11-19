@@ -8,6 +8,7 @@
 #include <iostream>
 #include <comdef.h>
 #include <filesystem>
+#include <array>
 
 #include <srima_src/srima_render_resource.h>
 
@@ -36,10 +37,6 @@ namespace
 		ComPtr<ID3D12GraphicsCommandList> command_list;
 		ComPtr<ID3D12Fence> fence;
 		HANDLE fence_event;
-
-		//ComPtr<ID3D12RootSignature> root_signature;
-		//ComPtr<ID3D12PipelineState> pipeline_state;
-		//ComPtr<ID3D12Resource> vertex_buffer;
 
 		uint32_t frame_index;
 		uint32_t rtv_descriptor_size;
@@ -199,6 +196,26 @@ void CreateFence()
 		IID_PPV_ARGS(&d3d12->fence))))
 		throw std::runtime_error("fence create failure.");
 }
+
+srimaRootSignature srima::helper::CreateEmptyRootSignature()
+{
+	ComPtr<ID3D12RootSignature> rs;
+	D3D12_ROOT_SIGNATURE_DESC root_signature_desc = {};
+
+	root_signature_desc.NumParameters = 0;
+	root_signature_desc.pParameters = nullptr;
+	root_signature_desc.NumStaticSamplers = 0;
+	root_signature_desc.pStaticSamplers = nullptr;
+	root_signature_desc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+	ComPtr<ID3DBlob> signature;
+	ComPtr<ID3DBlob> error;
+
+	if (FAILED(D3D12SerializeRootSignature(&root_signature_desc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error))) throw std::runtime_error("");
+	if (FAILED(d3d12->device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&rs))))  throw std::runtime_error("");
+
+	return rs;
+}
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 bool srima::Initialize(alnyr::alnyrRenderingDest * rendering_dest)
@@ -268,57 +285,53 @@ void srima::Clear(Color clear_color)
 {
 }
 
-
-//todo : Ç†Ç∆Ç≈è¡Ç∑
 void srima::Execute(const std::vector<srimaRenderResource*>& render_resources)
 {
 	HRESULT result;
 	auto current_frame_index = d3d12->frame_index;
 	constexpr float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
 
-	if (!WaitForPreviousFrame()) return;
-
-	D3D12_CPU_DESCRIPTOR_HANDLE rtv_handle = d3d12->rtv_heap->GetCPUDescriptorHandleForHeapStart();
-	rtv_handle.ptr += (d3d12->rtv_descriptor_size * current_frame_index);
+	D3D12_RESOURCE_BARRIER barrier;
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier.Transition.pResource = d3d12->render_targets[current_frame_index].Get();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
 	for (auto&& render_resource : render_resources)
 	{
 		result = d3d12->command_allocator[current_frame_index]->Reset();
 		result = d3d12->command_list->Reset(d3d12->command_allocator[current_frame_index].Get(), render_resource->GetPipelineState().Get());
-
 		d3d12->command_list->SetGraphicsRootSignature(render_resource->GetRootSignature().Get());
+
 		d3d12->command_list->RSSetViewports(1, &d3d12->viewport);
 		d3d12->command_list->RSSetScissorRects(1, &d3d12->scissor_rect);
 
-		D3D12_RESOURCE_BARRIER barrier;
-		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		barrier.Transition.pResource = d3d12->render_targets[current_frame_index].Get();
-		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
 		d3d12->command_list->ResourceBarrier(1, &barrier);
+		D3D12_CPU_DESCRIPTOR_HANDLE rtv_handle = d3d12->rtv_heap->GetCPUDescriptorHandleForHeapStart();
+		rtv_handle.ptr += (d3d12->rtv_descriptor_size * current_frame_index);
 
 		d3d12->command_list->OMSetRenderTargets(1, &rtv_handle, false, nullptr);
-
 		d3d12->command_list->ClearRenderTargetView(rtv_handle, clearColor, 0u, nullptr);
 
-		render_resource->StackCommand();
-
-		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-
-		d3d12->command_list->ResourceBarrier(1, &barrier);
-
-		result = d3d12->command_list->Close();
-
-		std::vector<ID3D12CommandList*> command_lists{ d3d12->command_list.Get() };
-		uint32_t command_lists_size = command_lists.size();
-		d3d12->command_queue->ExecuteCommandLists(command_lists_size, command_lists.data());
+		render_resource->StackCommand(d3d12->command_list);
 	}
 
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+
+	d3d12->command_list->ResourceBarrier(1, &barrier);
+
+	result = d3d12->command_list->Close();
+
+	std::vector<ID3D12CommandList*> command_lists{ d3d12->command_list.Get() };
+	uint32_t command_lists_size = static_cast<uint32_t>(command_lists.size());
+	d3d12->command_queue->ExecuteCommandLists(command_lists_size, command_lists.data());
+
 	d3d12->swapchain->Present(1, 0);
+
+	if (!WaitForPreviousFrame()) return;
 }
 
 void srima::Uninitialize()
@@ -330,7 +343,7 @@ void srima::Uninitialize()
 
 ///////////////////////////////////////////////////////
 
-ComPtr<ID3DBlob> CompileShader(std::filesystem::path hlsl_path, std::string shader_version, std::string function_name = "main")
+ComPtr<ID3DBlob> CompileShader(std::filesystem::path hlsl_path, std::string shader_version, std::string function_name)
 {
 #if defined(_DEBUG)
 	// Enable better shader debugging with the graphics debugging tools.
@@ -341,7 +354,7 @@ ComPtr<ID3DBlob> CompileShader(std::filesystem::path hlsl_path, std::string shad
 
 	ComPtr<ID3DBlob> shader;
 
-	auto cur = std::filesystem::current_path();
+	if (hlsl_path.empty()) return nullptr;
 	if (FAILED(D3DCompileFromFile(hlsl_path.c_str(), nullptr, nullptr, function_name.c_str(), shader_version.c_str(), compileFlags, 0, &shader, nullptr)))
 	{
 		throw std::runtime_error("shader compile error.");
@@ -360,6 +373,18 @@ ComPtr<ID3DBlob> LoadCompiledShader(std::filesystem::path cso_path)
 
 	return shader;
 }
+
+std::array<srimaShaderBlob, 5> CompileShaders(const srima::srimaShaderFilePaths shader_file_paths)
+{
+	std::array<srimaShaderBlob, 5> out;
+	out[srima::srimaShaderFilePaths::eVertex] = CompileShader(shader_file_paths.VS, "vs_5_0", "main");
+	out[srima::srimaShaderFilePaths::ePixel] = CompileShader(shader_file_paths.PS, "ps_5_0", "main");
+	out[srima::srimaShaderFilePaths::eDomain] = CompileShader(shader_file_paths.DS, "ds_5_0", "main");
+	out[srima::srimaShaderFilePaths::eHull] = CompileShader(shader_file_paths.HS, "hs_5_0", "main");
+	out[srima::srimaShaderFilePaths::eGeometry] = CompileShader(shader_file_paths.GS, "gs_5_0", "main");
+	return out;
+}
+
 
 void srima::SetDebugCallback(std::function<void(std::string_view)> callback)
 {
@@ -411,6 +436,11 @@ srima::srimaVertexBuffer srima::CreateVertexBuffer(void* vertices_start_ptr, uin
 	}
 	memcpy(vertex_data_begin, vertices_start_ptr, vertex_array_size);
 	vertex_buffer.vertex_buffer_view_state_[0].vertex_buffer_->Unmap(0, nullptr);
+
+	vertex_buffer.vertex_buffer_view_state_[0].stride_ = vertex_size;
+	vertex_buffer.vertex_buffer_view_state_[0].size_in_bytes_ = vertex_buffer_size;
+
+	if (!WaitForPreviousFrame()) throw std::runtime_error("");
 
 	return vertex_buffer;
 }
@@ -469,6 +499,7 @@ srimaBlendDesc srima::DefaultBlendDesc()
 
 	blend_desc.AlphaToCoverageEnable = FALSE;
 	blend_desc.IndependentBlendEnable = FALSE;
+
 	for (uint32_t i = 0; i < 8; ++i)
 	{
 		blend_desc.RenderTarget[i] = rtv_blend_desc;
@@ -499,6 +530,65 @@ srimaDepthStencilStateDesc srima::DefaultDepthStencilDesc()
 
 	return depth_stencil_desc;
 }
+
+srimaGraphicsPipelineState srima::helper::CreatePSO(srimaInputLayoutDesc input_layout_desc, const srimaRootSignature& root_signature, srimaShaderFilePaths shader_file_paths)
+{
+	srimaGraphicsPipelineState pso;
+	srimaGraphicsPipelineStateDesc pso_desc = {};
+	D3D12_SHADER_BYTECODE shader_bytecode = {};
+	ComPtr<ID3D12RootSignature> rs;
+
+	pso_desc.BlendState = DefaultBlendDesc();
+	pso_desc.DepthStencilState = DefaultDepthStencilDesc();
+	pso_desc.RasterizerState = DefaultRasterizerStateDesc();
+
+	auto blobs = CompileShaders(shader_file_paths);
+
+	auto vs_blob = blobs[srimaShaderFilePaths::eVertex];
+	if (vs_blob)
+	{
+		shader_bytecode.pShaderBytecode = vs_blob->GetBufferPointer();
+		shader_bytecode.BytecodeLength = vs_blob->GetBufferSize();
+		pso_desc.VS = shader_bytecode;
+	}
+
+	auto ps_blob = blobs[srimaShaderFilePaths::ePixel];
+	if (ps_blob)
+	{
+		shader_bytecode.pShaderBytecode = ps_blob->GetBufferPointer();
+		shader_bytecode.BytecodeLength = ps_blob->GetBufferSize();
+		pso_desc.PS = shader_bytecode;
+	}
+
+	pso_desc.InputLayout = input_layout_desc;
+
+	if (root_signature)
+	{
+		pso_desc.pRootSignature = root_signature.Get();
+	}
+	else
+	{
+		rs = CreateEmptyRootSignature();
+		pso_desc.pRootSignature = rs.Get();
+	}
+
+	pso_desc.DepthStencilState.DepthEnable = FALSE;
+	pso_desc.DepthStencilState.StencilEnable = FALSE;
+	pso_desc.SampleMask = UINT_MAX;
+	pso_desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	pso_desc.NumRenderTargets = 1;
+	pso_desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+	pso_desc.SampleDesc.Count = 1;
+	pso_desc.NodeMask = 1;
+
+	if (FAILED(d3d12->device->CreateGraphicsPipelineState(&pso_desc, IID_PPV_ARGS(&pso))))
+	{
+		throw std::runtime_error("pso create failure.");
+	}
+
+	return pso;
+}
+
 
 void srima::SetVertexBuffers(srimaVertexBuffer* vertex_buffer)
 {

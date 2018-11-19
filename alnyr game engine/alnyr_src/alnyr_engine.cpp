@@ -2,6 +2,7 @@
 #include <srima.hpp>
 #include <alnyr_scene.h>
 #include <alnyr_scene_manager.h>
+#include <srima_src/srima_render_resource.h>
 
 bool alnyr::alnyrEngine::Initialize()
 {
@@ -15,12 +16,27 @@ bool alnyr::alnyrEngine::Initialize()
 
 void alnyr::alnyrEngine::Run()
 {
+	std::vector<srima::srimaRenderResource*> render_resources;
+
+	render_resources.emplace_back(new srima::srimaTriangleSample);
+
+	for (auto&& render_resource : render_resources)
+	{
+		render_resource->Initialize();
+	}
+
 	while (window_->ProcessMessage())
 	{
 		scene_manager_->SceneUpdate();
 		scene_manager_->SceneRender();
 
-		srima::Execute();
+		srima::Execute(render_resources);
+	}
+
+	for (auto&& render_resource : render_resources)
+	{
+		delete render_resource;
+		render_resource = nullptr;
 	}
 }
 

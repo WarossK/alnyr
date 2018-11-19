@@ -17,3 +17,11 @@ using Quaternion = vec4;
 using Matrix = mat4x4;
 
 #endif
+
+namespace alnyr::math
+{
+	inline constexpr float leap(float start, float end, float t)
+	{
+		return (1.0f - t) * start + t * end;
+	}
+}

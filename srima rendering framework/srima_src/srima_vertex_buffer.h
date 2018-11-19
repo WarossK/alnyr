@@ -27,7 +27,7 @@ namespace srima
 			vertex_buffer_views.resize(vertex_buffer_view_state_.size());
 
 			const auto size = vertex_buffer_view_state_.size();
-			for (uint32_t i = 0u; size; ++i)
+			for (uint32_t i = 0u; i < size; ++i)
 			{
 				vertex_buffer_views[i].BufferLocation = vertex_buffer_view_state_[i].vertex_buffer_->GetGPUVirtualAddress();
 				vertex_buffer_views[i].StrideInBytes = vertex_buffer_view_state_[i].stride_;

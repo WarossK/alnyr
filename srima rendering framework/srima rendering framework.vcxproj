@@ -118,7 +118,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="srima.hpp" />
-    <ClInclude Include="srima_src\srima_rendering_pipeline.h" />
+    <ClInclude Include="srima_src\srima_render_resource.h" />
     <ClInclude Include="srima_src\srima_texture.h" />
     <ClInclude Include="srima_src\srima_vertex_buffer.h" />
     <ClInclude Include="srima_src\srima_vertex_types.h" />
