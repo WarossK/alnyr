@@ -74,7 +74,7 @@ namespace alnyr
 		}
 
 		template<class F, class... Args>
-		auto Enqueue(F&& f, Args&&... args) -> std::future<typename std::result_of<F(Args...)>::type>
+		auto Enqueue(F&& f, Args&&... args) -> std::future<typename std::invoke_result <F, Args...>::type>
 		{
 			using return_type = typename std::result_of<F(Args...)>::type;
 
@@ -109,7 +109,7 @@ namespace alnyr
 
 				for (auto&& wait : is_wait_)
 				{
-					if(!wait) return false;
+					if (!wait) return false;
 				}
 			}
 

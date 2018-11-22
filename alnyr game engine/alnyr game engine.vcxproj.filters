@@ -63,9 +63,6 @@
     <ClInclude Include="alnyr_src\alnyr_dynamic_mesh.h">
       <Filter>ヘッダー ファイル\resource</Filter>
     </ClInclude>
-    <ClInclude Include="alnyr_src\alnyr_util.h">
-      <Filter>ヘッダー ファイル\util</Filter>
-    </ClInclude>
     <ClInclude Include="alnyr_src\alnyr_material.h">
       <Filter>ヘッダー ファイル\material</Filter>
     </ClInclude>

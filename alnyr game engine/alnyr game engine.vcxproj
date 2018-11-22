@@ -138,7 +138,6 @@
     <ClInclude Include="alnyr_src\alnyr_sprite_renderer.h" />
     <ClInclude Include="alnyr_src\alnyr_static_mesh.h" />
     <ClInclude Include="alnyr_src\alnyr_thread_pool.h" />
-    <ClInclude Include="alnyr_src\alnyr_util.h" />
     <ClInclude Include="alnyr_src\alnyr_engine.h" />
     <ClInclude Include="alnyr_src\alnyr_texture.h" />
     <ClInclude Include="alnyr_src\alnyr_transform.h" />

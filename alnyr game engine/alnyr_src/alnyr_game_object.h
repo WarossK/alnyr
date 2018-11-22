@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <type_id.hpp>
 #include <boost/container/flat_map.hpp>
-#include <alnyr_src/alnyr_util.h>
+#include <alnyr_util.h>
 
 namespace alnyr
 {

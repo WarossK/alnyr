@@ -299,21 +299,23 @@ void srima::Execute(const std::vector<srimaRenderResource*>& render_resources)
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
+	result = d3d12->command_allocator[current_frame_index]->Reset();
+	result = d3d12->command_list->Reset(d3d12->command_allocator[current_frame_index].Get(), nullptr);
+
+	d3d12->command_list->RSSetViewports(1, &d3d12->viewport);
+	d3d12->command_list->RSSetScissorRects(1, &d3d12->scissor_rect);
+
+	d3d12->command_list->ResourceBarrier(1, &barrier);
+	D3D12_CPU_DESCRIPTOR_HANDLE rtv_handle = d3d12->rtv_heap->GetCPUDescriptorHandleForHeapStart();
+	rtv_handle.ptr += (d3d12->rtv_descriptor_size * current_frame_index);
+
+	d3d12->command_list->OMSetRenderTargets(1, &rtv_handle, false, nullptr);
+	d3d12->command_list->ClearRenderTargetView(rtv_handle, clearColor, 0u, nullptr);
+
 	for (auto&& render_resource : render_resources)
 	{
-		result = d3d12->command_allocator[current_frame_index]->Reset();
-		result = d3d12->command_list->Reset(d3d12->command_allocator[current_frame_index].Get(), render_resource->GetPipelineState().Get());
+		d3d12->command_list->SetPipelineState(render_resource->GetPipelineState().Get());
 		d3d12->command_list->SetGraphicsRootSignature(render_resource->GetRootSignature().Get());
-
-		d3d12->command_list->RSSetViewports(1, &d3d12->viewport);
-		d3d12->command_list->RSSetScissorRects(1, &d3d12->scissor_rect);
-
-		d3d12->command_list->ResourceBarrier(1, &barrier);
-		D3D12_CPU_DESCRIPTOR_HANDLE rtv_handle = d3d12->rtv_heap->GetCPUDescriptorHandleForHeapStart();
-		rtv_handle.ptr += (d3d12->rtv_descriptor_size * current_frame_index);
-
-		d3d12->command_list->OMSetRenderTargets(1, &rtv_handle, false, nullptr);
-		d3d12->command_list->ClearRenderTargetView(rtv_handle, clearColor, 0u, nullptr);
 
 		render_resource->StackCommand(d3d12->command_list);
 	}
@@ -428,19 +430,99 @@ srima::srimaVertexBuffer srima::CreateVertexBuffer(void* vertices_start_ptr, uin
 			IID_PPV_ARGS(&vertex_buffer.vertex_buffer_view_state_[0].vertex_buffer_)))) throw std::runtime_error("vertex buffer create failure.");
 	}
 
-	uint8_t* vertex_data_begin;
+	void* vertex_data_begin;
 	D3D12_RANGE	read_range = { 0, 0 };
 	if (FAILED(vertex_buffer.vertex_buffer_view_state_[0].vertex_buffer_->Map(0, &read_range, reinterpret_cast<void**>(&vertex_data_begin))))
 	{
 		throw std::runtime_error("vertex buffer mapping failure.");
 	}
-	memcpy(vertex_data_begin, vertices_start_ptr, vertex_array_size);
+	memcpy(vertex_data_begin, vertices_start_ptr, vertex_buffer_size);
 	vertex_buffer.vertex_buffer_view_state_[0].vertex_buffer_->Unmap(0, nullptr);
 
 	vertex_buffer.vertex_buffer_view_state_[0].stride_ = vertex_size;
 	vertex_buffer.vertex_buffer_view_state_[0].size_in_bytes_ = vertex_buffer_size;
 
-	if (!WaitForPreviousFrame()) throw std::runtime_error("");
+	if (!WaitForGpu()) throw std::runtime_error("");
+
+	return vertex_buffer;
+}
+
+srima::srimaVertexBuffer srima::CreateInstancingVertexBuffer(std::array<std::tuple<void*, uint32_t, uint32_t>, 2u> ptrs)
+{
+	srimaVertexBuffer vertex_buffer;
+	vertex_buffer.vertex_buffer_view_state_.resize(2u);
+
+	void* vertex_start_ptr = std::get<0>(ptrs[0]);
+	void* instance_start_ptr = std::get<0>(ptrs[1]);
+
+	const uint32_t vertex_size = std::get<1>(ptrs[0]);
+	const uint32_t vertex_array_size = std::get<2>(ptrs[0]);
+
+	const uint32_t instance_size = std::get<1>(ptrs[1]);
+	const uint32_t instance_array_size = std::get<2>(ptrs[1]);
+
+	const uint32_t vertex_buffer_size = vertex_size * vertex_array_size;
+	const uint32_t instance_buffer_size_impl = instance_size * instance_array_size;
+	const uint32_t instance_buffer_size = instance_buffer_size_impl % 16u ? instance_buffer_size_impl + 16u - (instance_buffer_size_impl % 16u) : instance_buffer_size_impl;
+
+	D3D12_HEAP_PROPERTIES heap_properties = {};
+	heap_properties.Type = D3D12_HEAP_TYPE_UPLOAD;
+	heap_properties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	heap_properties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	heap_properties.CreationNodeMask = 1;
+	heap_properties.VisibleNodeMask = 1;
+
+	D3D12_RESOURCE_DESC resource_desc = {};
+	resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	resource_desc.Alignment = 0;
+	resource_desc.Width = vertex_buffer_size;
+	resource_desc.Height = 1;
+	resource_desc.DepthOrArraySize = 1;
+	resource_desc.MipLevels = 1;
+	resource_desc.Format = DXGI_FORMAT_UNKNOWN;
+	resource_desc.SampleDesc.Count = 1;
+	resource_desc.SampleDesc.Quality = 0;
+	resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	if (FAILED(d3d12->device->CreateCommittedResource(
+		&heap_properties,
+		D3D12_HEAP_FLAG_NONE,
+		&resource_desc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&vertex_buffer.vertex_buffer_view_state_[0].vertex_buffer_)))) throw std::runtime_error("vertex buffer create failure.");
+
+	resource_desc.Width = instance_buffer_size;
+
+	if (FAILED(d3d12->device->CreateCommittedResource(
+		&heap_properties,
+		D3D12_HEAP_FLAG_NONE,
+		&resource_desc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&vertex_buffer.vertex_buffer_view_state_[1].vertex_buffer_)))) throw std::runtime_error("instance buffer create failure.");
+
+	void* vertex_data_begin;
+	D3D12_RANGE	read_range = { 0, 0 };
+	void* start_ptrs[]{ vertex_start_ptr, instance_start_ptr };
+	uint32_t size_per_obj[]{ vertex_size, instance_size };
+	uint32_t size_per_buffer[]{ vertex_buffer_size, instance_buffer_size };
+
+	for (uint32_t i = 0; i < 2u; ++i)
+	{
+		if (FAILED(vertex_buffer.vertex_buffer_view_state_[0].vertex_buffer_->Map(0, &read_range, reinterpret_cast<void**>(&vertex_data_begin))))
+		{
+			throw std::runtime_error("vertex buffer mapping failure.");
+		}
+		memcpy(vertex_data_begin, start_ptrs[i], vertex_buffer_size);
+		vertex_buffer.vertex_buffer_view_state_[i].vertex_buffer_->Unmap(0, nullptr);
+
+		vertex_buffer.vertex_buffer_view_state_[i].stride_ = size_per_obj[i];
+		vertex_buffer.vertex_buffer_view_state_[i].size_in_bytes_ = size_per_buffer[i];
+	}
+
+	if (!WaitForGpu()) throw std::runtime_error("");
 
 	return vertex_buffer;
 }

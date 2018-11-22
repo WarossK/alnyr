@@ -17,6 +17,7 @@ namespace srima
 	class srimaVertexBuffer
 	{
 		friend srimaVertexBuffer CreateVertexBuffer(void* vertices_start_ptr, uint32_t vertex_size, uint32_t vertex_array_size);
+		friend srimaVertexBuffer CreateInstancingVertexBuffer(std::array<std::tuple<void*, uint32_t, uint32_t>, 2u> ptrs);
 	private:
 		std::vector<srimaVertexBufferViewState> vertex_buffer_view_state_;
 

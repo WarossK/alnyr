@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <filesystem>
 #include <alnyr_math.h>
 #include <alnyr_rendering_dest.h>
@@ -17,6 +18,9 @@ using srimaGraphicsPipelineState = Microsoft::WRL::ComPtr<ID3D12PipelineState>;
 using srimaRootSignature = Microsoft::WRL::ComPtr<ID3D12RootSignature>;
 using srimaInputLayoutDesc = D3D12_INPUT_LAYOUT_DESC;
 using srimaShaderBlob = Microsoft::WRL::ComPtr<ID3DBlob>;
+
+using srimaConstantBuffer = Microsoft::WRL::ComPtr<ID3D12Resource>;
+using srimaIndexBuffer = Microsoft::WRL::ComPtr<ID3D12Resource>;
 
 using srimaCommandList = Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>;
 
@@ -75,11 +79,64 @@ namespace srima
 
 	//Create Functions
 	//////////////////////
-	srimaVertexBuffer CreateVertexBuffer(void* vertices_start_ptr, uint32_t vertex_size, uint32_t vertex_array_size);//インスタンシングしない前提で作っとる
+	//単体バーテックスバッファ
+	srimaVertexBuffer CreateVertexBuffer(void* vertices_start_ptr, uint32_t vertex_size, uint32_t vertex_array_size);
 	template<class VertexType> srimaVertexBuffer CreateVertexBuffer(const std::vector<VertexType>& vertices)
 	{
 		auto vertex_list = vertices;
-		return CreateVertexBuffer(vertex_list.data(), sizeof(typename decltype(vertex_list)::value_type), static_cast<uint32_t>(vertex_list.size()));
+		return CreateVertexBuffer(vertex_list.data(), static_cast<uint32_t>(sizeof(VertexType)), static_cast<uint32_t>(vertex_list.size()));
+	}
+
+	template<class VertexType, size_t N> srimaVertexBuffer CreateVertexBuffer(const std::array<VertexType, N>& vertices)
+	{
+		auto vertex_list = vertices;
+		return CreateVertexBuffer(vertex_list.data(), static_cast<uint32_t>(sizeof(VertexType)), static_cast<uint32_t>(N));
+	}
+
+	template<class VertexType, size_t N> srimaVertexBuffer CreateVertexBuffer(VertexType (&vertices)[N])
+	{
+		return CreateVertexBuffer(vertices, sizeof(VertexType), static_cast<uint32_t>(N));
+	}
+
+	//インスタンシングバーテックスバッファ
+	srimaVertexBuffer CreateInstancingVertexBuffer(std::array<std::tuple<void*, uint32_t, uint32_t>, 2u> ptrs);
+	template<class Type1, class Type2, size_t N1, size_t N2> srimaVertexBuffer CreateInstancingVertexBuffer(std::array<Type1, N1> vertices, std::array<Type2, N2> per_instance_data)
+	{
+		using per_data_size = uint32_t;
+		using array_size = uint32_t;
+
+		std::array<std::tuple<void*, per_data_size, array_size>, 2u> ptrs;
+
+		ptrs[0] = std::make_tuple(vertices.data(), static_cast<uint32_t>(sizeof(Type1)), static_cast<uint32_t>(N1));
+		ptrs[1] = std::make_tuple(per_instance_data.data(), static_cast<uint32_t>(sizeof(Type2)), static_cast<uint32_t>(N2));
+
+		return CreateInstancingVertexBuffer(ptrs);
+	}
+
+	template<class Type1, class Type2, size_t N1, size_t N2> srimaVertexBuffer CreateInstancingVertexBuffer(Type1 (&vertices)[N1], Type2 (&per_instance_data)[N2])
+	{
+		using per_data_size = uint32_t;
+		using array_size = uint32_t;
+
+		std::array<std::tuple<void*, per_data_size, array_size>, 2u> ptrs;
+
+		ptrs[0] = std::make_tuple(vertices, static_cast<uint32_t>(sizeof(Type1)), static_cast<uint32_t>(N1));
+		ptrs[1] = std::make_tuple(per_instance_data, static_cast<uint32_t>(sizeof(Type2)), static_cast<uint32_t>(N2));
+
+		return CreateInstancingVertexBuffer(ptrs);
+	}
+
+	template<class Type1, class Type2> srimaVertexBuffer CreateInstancingVertexBuffer(std::vector<Type1> vertices, std::vector<Type2> per_instance_data)
+	{
+		using per_data_size = uint32_t;
+		using array_size = uint32_t;
+
+		std::array<std::tuple<void*, per_data_size, array_size>, 2u> ptrs;
+
+		ptrs[0] = std::make_tuple(vertices.data(), static_cast<uint32_t>(sizeof(Type1)), static_cast<uint32_t>(vertices.size()));
+		ptrs[1] = std::make_tuple(per_instance_data.data(), static_cast<uint32_t>(sizeof(Type2)), static_cast<uint32_t>(per_instance_data.size()));
+
+		return CreateInstancingVertexBuffer(ptrs);
 	}
 
 	srimaGraphicsPipelineState CreatePipeline(srimaGraphicsPipelineStateDesc* pipeline_state_desc);//デカすぎてキレイにラップできねぇ・・・
@@ -107,13 +164,13 @@ namespace srima
 	}
 
 
-//#if defined(_DEBUG)
-//	Microsoft::WRL::ComPtr<ID3DBlob> CompileShader(std::filesystem::path hlsl_path, std::string shader_version, std::string function_name = "main");
-//#endif
-	//End of Create Functions
+	//#if defined(_DEBUG)
+	//	Microsoft::WRL::ComPtr<ID3DBlob> CompileShader(std::filesystem::path hlsl_path, std::string shader_version, std::string function_name = "main");
+	//#endif
+		//End of Create Functions
 
-	//Set Functions
-	/////////////////////////
+		//Set Functions
+		/////////////////////////
 	void SetVertexBuffers(srimaVertexBuffer* vertex_buffer);
 	//End of Set Functions
 
