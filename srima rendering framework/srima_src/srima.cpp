@@ -285,7 +285,7 @@ void srima::Clear(Color clear_color)
 {
 }
 
-void srima::Execute(const std::vector<srimaRenderResource*>& render_resources)
+bool srima::Execute(const std::vector<srimaRenderResource*>& render_resources)
 {
 	HRESULT result;
 	auto current_frame_index = d3d12->frame_index;
@@ -333,7 +333,7 @@ void srima::Execute(const std::vector<srimaRenderResource*>& render_resources)
 
 	d3d12->swapchain->Present(1, 0);
 
-	if (!WaitForPreviousFrame()) return;
+	return WaitForPreviousFrame();
 }
 
 void srima::Uninitialize()
@@ -449,8 +449,10 @@ srima::srimaVertexBuffer srima::CreateVertexBuffer(void* vertices_start_ptr, uin
 
 srima::srimaVertexBuffer srima::CreateInstancingVertexBuffer(std::array<std::tuple<void*, uint32_t, uint32_t>, 2u> ptrs)
 {
+	constexpr uint32_t kCompositBufferNum = 2u;
+
 	srimaVertexBuffer vertex_buffer;
-	vertex_buffer.vertex_buffer_view_state_.resize(2u);
+	vertex_buffer.vertex_buffer_view_state_.resize(kCompositBufferNum);
 
 	void* vertex_start_ptr = std::get<0>(ptrs[0]);
 	void* instance_start_ptr = std::get<0>(ptrs[1]);
@@ -485,44 +487,55 @@ srima::srimaVertexBuffer srima::CreateInstancingVertexBuffer(std::array<std::tup
 	resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
+
 	if (FAILED(d3d12->device->CreateCommittedResource(
 		&heap_properties,
 		D3D12_HEAP_FLAG_NONE,
 		&resource_desc,
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
-		IID_PPV_ARGS(&vertex_buffer.vertex_buffer_view_state_[0].vertex_buffer_)))) throw std::runtime_error("vertex buffer create failure.");
+		IID_PPV_ARGS(&vertex_buffer.vertex_buffer_view_state_[0].vertex_buffer_))))
+	{
+		throw std::runtime_error("vertex buffer create failure.");
+	}
 
 	resource_desc.Width = instance_buffer_size;
-
 	if (FAILED(d3d12->device->CreateCommittedResource(
 		&heap_properties,
 		D3D12_HEAP_FLAG_NONE,
 		&resource_desc,
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
-		IID_PPV_ARGS(&vertex_buffer.vertex_buffer_view_state_[1].vertex_buffer_)))) throw std::runtime_error("instance buffer create failure.");
+		IID_PPV_ARGS(&vertex_buffer.vertex_buffer_view_state_[1].vertex_buffer_))))
+	{
+		throw std::runtime_error("instance buffer create failure.");
+	}
 
-	void* vertex_data_begin;
-	D3D12_RANGE	read_range = { 0, 0 };
 	void* start_ptrs[]{ vertex_start_ptr, instance_start_ptr };
 	uint32_t size_per_obj[]{ vertex_size, instance_size };
 	uint32_t size_per_buffer[]{ vertex_buffer_size, instance_buffer_size };
 
-	for (uint32_t i = 0; i < 2u; ++i)
+	for (uint32_t i = 0u; i < kCompositBufferNum; ++i)
 	{
-		if (FAILED(vertex_buffer.vertex_buffer_view_state_[0].vertex_buffer_->Map(0, &read_range, reinterpret_cast<void**>(&vertex_data_begin))))
+		void* vertex_data_begin;
+		D3D12_RANGE	read_range = { 0, 0 };
+
+		if (FAILED(vertex_buffer.vertex_buffer_view_state_[i].vertex_buffer_->Map(
+			0u,
+			&read_range,
+			reinterpret_cast<void**>(&vertex_data_begin))))
 		{
 			throw std::runtime_error("vertex buffer mapping failure.");
 		}
-		memcpy(vertex_data_begin, start_ptrs[i], vertex_buffer_size);
-		vertex_buffer.vertex_buffer_view_state_[i].vertex_buffer_->Unmap(0, nullptr);
+
+		memcpy(vertex_data_begin, start_ptrs[i], size_per_buffer[i]);
+		vertex_buffer.vertex_buffer_view_state_[i].vertex_buffer_->Unmap(0u, nullptr);
 
 		vertex_buffer.vertex_buffer_view_state_[i].stride_ = size_per_obj[i];
 		vertex_buffer.vertex_buffer_view_state_[i].size_in_bytes_ = size_per_buffer[i];
 	}
 
-	if (!WaitForGpu()) throw std::runtime_error("");
+	if (!WaitForGpu()) throw std::runtime_error("vertex buffer gpu wait faulure.");
 
 	return vertex_buffer;
 }
@@ -693,7 +706,7 @@ bool WaitForPreviousFrame()
 {
 	const uint64_t current_fence_value = d3d12->master_fence_value;
 	if (FAILED(d3d12->command_queue->Signal(d3d12->fence.Get(), current_fence_value))) return false;
-	d3d12->master_fence_value++;
+	++(d3d12->master_fence_value);
 
 	if (d3d12->fence->GetCompletedValue() < current_fence_value)
 	{
@@ -709,12 +722,10 @@ bool WaitForPreviousFrame()
 bool WaitForGpu()
 {
 	const uint64_t current_fence_value = d3d12->master_fence_value;
-
 	if (FAILED(d3d12->command_queue->Signal(d3d12->fence.Get(), current_fence_value))) return false;
 	++d3d12->master_fence_value;
 
 	if (FAILED(d3d12->fence->SetEventOnCompletion(current_fence_value, d3d12->fence_event))) return false;
-
 	WaitForSingleObject(d3d12->fence_event, INFINITE);
 
 	return true;

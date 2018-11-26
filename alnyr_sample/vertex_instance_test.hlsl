@@ -1,7 +1,8 @@
 struct VSIn
 {
-    float4 position : SV_POSITION;
+    float4 position : POSITION;
     float4 color : COLOR;
+
     float3 position_per_instance : RELATIVE_POS;
 };
 
@@ -15,7 +16,7 @@ VSOut main(VSIn vsin)
 {
     VSOut result;
  
-    result.position = vsin.position; //+ float4(position_per_instance, 1.0f);
+    result.position = float4(vsin.position.xyz + vsin.position_per_instance, 1.0f);
     result.color = vsin.color;
  
     return result;

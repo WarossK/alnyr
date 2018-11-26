@@ -71,7 +71,7 @@ namespace srima
 
 	bool Initialize(alnyr::alnyrRenderingDest* rendering_dest);
 	void Clear(Color clear_color = { 0.0f, 0.0f, 0.0f, 1.0f }); //default clear color is black.
-	void Execute(const std::vector<srimaRenderResource*>& render_resources);
+	bool Execute(const std::vector<srimaRenderResource*>& render_resources);
 	void Uninitialize();
 
 	//recommend : in #if defined(_DEBUG) block.
