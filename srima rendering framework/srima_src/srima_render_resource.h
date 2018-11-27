@@ -3,6 +3,8 @@
 #include <srima.hpp>
 #include <srima_src/srima_vertex_types.h>
 
+#undef max
+
 namespace srima
 {
 	struct srimaConstantBufferPerInstance
@@ -14,6 +16,8 @@ namespace srima
 	class srimaRenderResource
 	{
 	protected:
+		uint32_t vertex_num_;
+		uint32_t instance_num_;
 		srimaRootSignature root_signature_;
 		srimaConstantBuffer constant_buffer_;
 		srimaGraphicsPipelineState pipeline_state_;
@@ -24,21 +28,23 @@ namespace srima
 		const srimaGraphicsPipelineState& GetPipelineState() const { return pipeline_state_; }
 
 		virtual void Initialize() {}
+		virtual void StackCommand(const srimaCommandList&) = 0;
 
-		void UpdateDataPerInstance(void* ptr, size_t size)
+		void UpdateInstance(uint32_t index, uint32_t per_size, void* ptr, uint32_t arr_size)
 		{
-
+			UpdateDataPerInstance(index, per_size, ptr, arr_size);
+			(index ? instance_num_ : vertex_num_) = arr_size;
+			WaitForGpu();
 		}
 
-		virtual void StackCommand(const srimaCommandList&) = 0;
+	private:
+		virtual void UpdateDataPerInstance(uint32_t index, uint32_t per_size, void* ptr, uint32_t arr_size) {}
 	};
 
 	class srimaTriangleSample : public srimaRenderResource
 	{
 	private:
 		srimaVertexBuffer vertex_buffer_;
-		uint32_t vertex_num_;
-		uint32_t instance_num_;
 
 	public:
 		srimaTriangleSample()
@@ -48,95 +54,57 @@ namespace srima
 		void Initialize() override
 		{
 			srimaShaderFilePaths shader_file_paths;
-			shader_file_paths.VS = "vertex_test.hlsl";
+			shader_file_paths.VS = "vertex_instance_test.hlsl";
 			shader_file_paths.PS = "pixel_test.hlsl";
 
 			root_signature_ = helper::CreateEmptyRootSignature();
-#if true
-			shader_file_paths.VS = "vertex_instance_test.hlsl";
 
 			__declspec(align(16)) struct vertex1
 			{
-				Vector4 pos;
+				Vector3 pos;
 				Color col;
 			};
 
 			D3D12_INPUT_ELEMENT_DESC ied[]
 			{
-				{"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0,  0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-				{"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,  0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 				{"RELATIVE_POS", 0, DXGI_FORMAT_R32G32B32_FLOAT,	1,  0, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1}
 			};
 
-			vertex1 vertices[]
+			auto xxx = 2.0f / 1280.0f;
+			auto yyy = 2.0f / 720.0f;
+
+			std::vector<vertex1> vertices
 			{
-				{ DirectX::XMFLOAT4(0.0f, 0.5f, 0.0f, 1.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
-				{ DirectX::XMFLOAT4(0.5f, -0.5f, 0.0f, 1.0f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-				{ DirectX::XMFLOAT4(-0.5f, -0.5f, 0.0f, 1.0f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+				{ DirectX::XMFLOAT3(-1.0f,			1.0f,		0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
+				{ DirectX::XMFLOAT3(-1.0f + xxx,	1.0f,		0.0f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+				{ DirectX::XMFLOAT3(-1.0f,			1.0f - yyy,	0.0f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+				{ DirectX::XMFLOAT3(-1.0f + xxx,	1.0f - yyy,	0.0f), DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) },
 			};
 
-			Vector3 positions[]
-			{
-				{ 0.0f, 0.0f, 0.0f },
-				{ 0.0f, 0.0f, 0.0f },
-				{ 0.0f, 0.0f, 0.0f },
-				{ 0.0f, 0.0f, 0.0f },
-				{ 0.0f, 0.0f, 0.0f },
-
-				{ 0.0f, 0.0f, 0.0f },
-				{ 0.0f, 0.0f, 0.0f },
-				{ 0.0f, 0.0f, 0.0f },
-				{ 0.0f, 0.0f, 0.0f },
-				{ 0.0f, 0.0f, 0.0f },
-
-				{ 0.0f, 0.0f, 0.0f },
-			};
-
-			for (uint32_t i = 0u; i < std::extent_v<decltype(positions)>; ++i)
-			{
-				positions[i].x = -0.5f + 0.1f * i;
-				positions[i].y = 0.5f;
-				positions[i].z = 0.0f;
-			}
+			std::vector<Vector3> ins;
+			ins.resize(1'150'000u);
 
 			D3D12_INPUT_LAYOUT_DESC ild;
 			ild.pInputElementDescs = ied;
 			ild.NumElements = static_cast<uint32_t>(std::extent_v<decltype(ied)>);
 
-			vertex_buffer_ = CreateInstancingVertexBuffer(vertices, positions);
+			vertex_buffer_ = CreateInstancingVertexBuffer(vertices, ins);
 			pipeline_state_ = helper::CreatePSO(ild, root_signature_, shader_file_paths);
 
-			vertex_num_ = std::extent_v<decltype(vertices)>;
-			instance_num_ = std::extent_v<decltype(positions)>;
+			vertex_num_ = static_cast<uint32_t>(vertices.size());
+			instance_num_ = static_cast<uint32_t>(ins.size());
+		}
 
-			//↑ オリジナル頂点,	↓ 定義済み頂点(注意 : 入力PositionのセマンティクスがSV_POSITION)
-#else
-			std::vector<srima::srimaVertexPositionColor> vertices
-			{
-				{ DirectX::XMFLOAT3(0.0f, 0.5f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
-				{ DirectX::XMFLOAT3(0.5f, -0.5f, 0.0f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-				{ DirectX::XMFLOAT3(-0.5f, -0.5f, 0.0f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
-			};
-
-			srima::srimaVertexPositionColor vertices2[]
-			{
-				{ DirectX::XMFLOAT3(0.0f, 0.5f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
-				{ DirectX::XMFLOAT3(0.5f, -0.5f, 0.0f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-				{ DirectX::XMFLOAT3(-0.5f, -0.5f, 0.0f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
-			};
-
-			vertex_buffer_ = CreateVertexBuffer(vertices2);
-
-			pipeline_state_ = helper::CreatePSO<srima::srimaVertexPositionColor>(root_signature_, shader_file_paths);
-
-			vertex_num_ = std::extent_v<decltype(vertices2)>;
-			instance_num_ = 10u;
-#endif
+		void UpdateDataPerInstance(uint32_t index, uint32_t per_size, void* ptr, uint32_t arr_size) override
+		{
+			vertex_buffer_.Remap(index, ptr, arr_size * per_size);
 		}
 
 		void StackCommand(const srimaCommandList& cl) override
 		{
-			cl->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			cl->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
 			auto vbvs = vertex_buffer_.GetVertexBufferView();
 

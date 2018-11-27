@@ -163,6 +163,8 @@ namespace srima
 		srimaGraphicsPipelineState CreateParticlePSO();
 	}
 
+	bool WaitForPreviousFrame();
+	bool WaitForGpu();
 
 	//#if defined(_DEBUG)
 	//	Microsoft::WRL::ComPtr<ID3DBlob> CompileShader(std::filesystem::path hlsl_path, std::string shader_version, std::string function_name = "main");

@@ -22,6 +22,19 @@ namespace srima
 		std::vector<srimaVertexBufferViewState> vertex_buffer_view_state_;
 
 	public:
+		void Remap(uint32_t index, void* ptr, uint32_t size)
+		{
+			void* gpu_ptr;
+			D3D12_RANGE range { 0, 0 };
+			if (FAILED(vertex_buffer_view_state_[index].vertex_buffer_->Map(0u, &range, &gpu_ptr)))
+			{
+				throw std::runtime_error("gpu memory map error.");
+			}
+
+			memcpy(gpu_ptr, ptr, size);
+			vertex_buffer_view_state_[index].vertex_buffer_->Unmap(0u, nullptr);
+		}
+
 		const std::vector<D3D12_VERTEX_BUFFER_VIEW> GetVertexBufferView()
 		{
 			std::vector<D3D12_VERTEX_BUFFER_VIEW> vertex_buffer_views;

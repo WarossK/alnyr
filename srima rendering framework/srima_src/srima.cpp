@@ -702,7 +702,7 @@ void srima::DrawInstanced(uint32_t vertex_count, uint32_t instance_count)
 }
 
 //Minimum Implementation
-bool WaitForPreviousFrame()
+bool srima::WaitForPreviousFrame()
 {
 	const uint64_t current_fence_value = d3d12->master_fence_value;
 	if (FAILED(d3d12->command_queue->Signal(d3d12->fence.Get(), current_fence_value))) return false;
@@ -719,7 +719,7 @@ bool WaitForPreviousFrame()
 	return true;
 }
 
-bool WaitForGpu()
+bool srima::WaitForGpu()
 {
 	const uint64_t current_fence_value = d3d12->master_fence_value;
 	if (FAILED(d3d12->command_queue->Signal(d3d12->fence.Get(), current_fence_value))) return false;
