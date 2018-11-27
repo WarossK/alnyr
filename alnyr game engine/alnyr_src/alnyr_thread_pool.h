@@ -99,7 +99,7 @@ namespace alnyr
 
 		void WaitProcess()
 		{
-			while (IsProcessComplete());
+			while (!IsProcessComplete());
 		}
 
 		bool IsProcessComplete()

@@ -4,6 +4,7 @@
 #include <alnyr_scene_manager.h>
 #include <srima_src/srima_render_resource.h>
 #include <chrono>
+#include <random>
 
 #undef max
 
@@ -19,10 +20,19 @@ bool alnyr::alnyrEngine::Initialize()
 	return true;
 }
 
+#define thresd_num 2
 void alnyr::alnyrEngine::Run()
 {
-	constexpr uint32_t kInstanceNum = 1'150'000u;
+	alnyrThreadPool<thresd_num> tp;
+	const auto& width = window_->GetWidth();
+	const auto& height = window_->GetHeight();
+	const uint32_t kInstanceNum = width * height;
 	std::vector<srima::srimaRenderResource*> render_resources;
+	std::mt19937 mt;
+	std::random_device rnd;
+	mt.seed(rnd());
+
+	std::uniform_real_distribution rndom(-1.0f, 1.0f);
 
 	render_resources.emplace_back(new srima::srimaTriangleSample);
 
@@ -33,32 +43,50 @@ void alnyr::alnyrEngine::Run()
 
 	ins.resize(kInstanceNum);
 
-	float x = 0.0f;
-	int y = 0u;
-	for (auto&& i : ins)
-	{
-		auto xxx = 2.0f / 1280.0f;
-		auto yyy = 2.0f / 720.0f;
-		i.x = std::fmodf(xxx * x, 2.0f);
-		i.y = y * -yyy;
-		i.z = 0.0f;
-
-		++x;
-		y = static_cast<int>(x / 1280.0f);
-	}
-
 	auto start_time = std::chrono::system_clock::now();
 	uint32_t frame_count = 0u;
+	const auto xxx = 2.0f / width;
+	const auto yyy = 2.0f / height;
+	Vector2 pos{};
 
 	while (window_->ProcessMessage())
 	{
+#if true
+		auto i = 0;
+		for (auto&& itr : ins)
+		{
+			itr.x = std::fmodf(xxx * i, 2.0f) + rndom(mt);
+			itr.y = (i / width * -yyy) + rndom(mt);
+			itr.z = 0.0f;
+			++i;
+		}
+#elif true
+		auto i = 0;
+		for (auto&& itr : ins)
+		{
+			itr.x = std::fmodf(xxx * i, 2.0f);
+			itr.y = (i / width * -yyy);
+			itr.z = 0.0f;
+			++i;
+	}
+#else
+		auto i = 0;
+		for (auto&& itr : ins)
+		{
+			itr.x = std::fmodf(xxx * i, 2.0f);
+			itr.y = (i / width * -yyy);
+			//itr.z = 0.0f;
+			++i;
+		}
+#endif
+
+		scene_manager_->SceneUpdate();
+		scene_manager_->SceneRender();
+
 		for (auto&& rr : render_resources)
 		{
 			rr->UpdateInstance(1u, sizeof(Vector3), ins.data(), static_cast<uint32_t>(ins.size()));
 		}
-
-		scene_manager_->SceneUpdate();
-		scene_manager_->SceneRender();
 
 		srima::Execute(render_resources);
 
@@ -75,7 +103,7 @@ void alnyr::alnyrEngine::Run()
 		}
 
 		++frame_count;
-	}
+}
 
 	for (auto&& render_resource : render_resources)
 	{

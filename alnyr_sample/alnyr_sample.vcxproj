@@ -113,6 +113,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)alnyr utility(bridge);$(SolutionDir)alnyr rendering destination;$(SolutionDir)srima rendering framework;$(SolutionDir)alnyr game engine;$(CTTI_DIR);$(BOOST_1_68_0_DIR)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
