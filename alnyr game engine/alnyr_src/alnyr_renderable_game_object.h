@@ -2,26 +2,23 @@
 
 #include <alnyr_material.h>
 #include <alnyr_transform.h>
-#include <alnyr_game_object.h>
+#include <alnyr_positionable_game_object.h>
 
 namespace alnyr
 {
-	class alnyrRenderableGameObject : public alnyrGameObject
+	class alnyrRenderableGameObject : public alnyrPositionableGameObject
 	{
 	private:
-		alnyrTransform* transform_;
 		alnyrMaterial* material_;
 
 	public:
 		alnyrRenderableGameObject()
 		{
-			transform_ = AddBehavior<alnyrTransform>();
 			material_ = AddBehavior<alnyrMaterial>();
 		}
 
 		virtual ~alnyrRenderableGameObject() {}
 
-		alnyrTransform* GetTransform() { return transform_; }
 		alnyrMaterial* GetMaterial() { return material_; }
 	};
 }

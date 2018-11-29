@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -85,7 +85,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)alnyr utility(bridge);$(ProjectDir)srima_src;$(ProjectDir);$(CTTI_DIR);$(SolutionDir)alnyr rendering destination</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(BOOST_1_68_0_DIR);$(SolutionDir)alnyr utility(bridge);$(ProjectDir)srima_src;$(ProjectDir);$(CTTI_DIR);$(SolutionDir)alnyr rendering destination</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -110,8 +110,9 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)alnyr utility(bridge);$(ProjectDir)srima_src;$(ProjectDir);$(CTTI_DIR);$(SolutionDir)alnyr rendering destination</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(BOOST_1_68_0_DIR);$(SolutionDir)alnyr utility(bridge);$(ProjectDir)srima_src;$(ProjectDir);$(CTTI_DIR);$(SolutionDir)alnyr rendering destination</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -120,6 +121,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="srima.hpp" />
+    <ClInclude Include="srima_render_resource_manager.h" />
     <ClInclude Include="srima_src\srima_render_resource.h" />
     <ClInclude Include="srima_src\srima_texture.h" />
     <ClInclude Include="srima_src\srima_vertex_buffer.h" />

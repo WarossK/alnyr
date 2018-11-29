@@ -5,10 +5,13 @@
 #include <type_id.hpp>
 #include <boost/container/flat_map.hpp>
 #include <alnyr_util.h>
+#include <alnyr_math.h>
 
 namespace alnyr
 {
 	class alnyrObjectBehavior;
+	class alnyrTransform;
+
 	class alnyrGameObject
 	{
 	private:
@@ -31,6 +34,7 @@ namespace alnyr
 		alnyrGameObject* GetParent();
 		void AddChild(alnyrGameObject* child);
 		void RemoveChild(alnyrGameObject* child); //removeしたオブジェクトにchildの所有権を渡す。
+		const std::vector<alnyrGameObject*>& GetChildren();
 
 		void Destroy();
 		const bool& IsDestroyed();
@@ -47,8 +51,8 @@ namespace alnyr
 		//クッソ遅いのでオブジェクトのイニシャライズでキャッシュしてほしい
 		template<class BehaviorType> BehaviorType* GetBehavior()
 		{
-			if (!object_behaviors_.count(ctti::type_id<BehaviorType>())) throw std::runtime_error("behavior is not find.");
-			return object_behaviors_[ctti::type_id<BehaviorType>()];
+			if (!object_behaviors_.count(ctti::type_id<BehaviorType>())) throw std::runtime_error("behavior is not found.");
+			return static_cast<BehaviorType>(object_behaviors_[ctti::type_id<BehaviorType>()]);
 		}
 	};
 }

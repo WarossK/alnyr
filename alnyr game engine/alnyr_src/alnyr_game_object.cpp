@@ -1,8 +1,11 @@
 #include "alnyr_game_object.h"
 #include <alnyr_object_behavior.h>
 
+#undef max
+
 alnyr::alnyrGameObject::alnyrGameObject(uint32_t behavior_capacity) :
-	is_destroy_(false)
+	transform_(nullptr)
+	, is_destroy_(false)
 	, is_bring_scene_change_(false)
 {
 	auto cap = behavior_capacity ? behavior_capacity : std::numeric_limits<uint32_t>::max();

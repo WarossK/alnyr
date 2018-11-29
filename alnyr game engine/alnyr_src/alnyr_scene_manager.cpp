@@ -95,6 +95,11 @@ void alnyr::alnyrSceneManager::SceneUpdate()
 
 	case eLoading:
 		load_scene_->ObjectUpdate();
+
+		if (load_thread_.IsProcessComplete())
+		{
+			scene_state_ = eFadeIn;
+		}
 		break;
 
 	default:
@@ -136,7 +141,7 @@ void alnyr::LoadNextSceneResource(alnyrScene * next_scene)
 
 void alnyr::SceneChange(uint32_t fade_out_frame, uint32_t fade_in_frame)
 {
-	manager->fade_out_frame_ = fade_out_frame == std::numeric_limits<uint32_t>::max() ? manager->fade_out_frame_ : fade_out_frame;
-	manager->fade_in_frame_ = fade_in_frame == std::numeric_limits<uint32_t>::max() ? manager->fade_in_frame_ : fade_in_frame;
+	manager->fade_out_frame_ = (fade_out_frame == std::numeric_limits<uint32_t>::max()) ? manager->fade_out_frame_ : fade_out_frame;
+	manager->fade_in_frame_ = (fade_in_frame == std::numeric_limits<uint32_t>::max()) ? manager->fade_in_frame_ : fade_in_frame;
 	manager->scene_state_ = eFadeOut;
 }

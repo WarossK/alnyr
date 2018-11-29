@@ -65,11 +65,18 @@ namespace srima
 				Color col;
 			};
 
+			__declspec(align(16)) struct instance1
+			{
+				Vector3 pos;
+				bool is_live;
+			};
+
 			D3D12_INPUT_ELEMENT_DESC ied[]
 			{
-				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,  0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-				{"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-				{"RELATIVE_POS", 0, DXGI_FORMAT_R32G32B32_FLOAT,	1,  0, D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, 1}
+				{"POSITION",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0,  0,	D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,		0},
+				{"COLOR",			0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0,	12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,		0},
+				{"RELATIVE_POS",	0, DXGI_FORMAT_R32G32B32_FLOAT,		1,  0,	D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA,	1},
+				{"IS_LIVE",			0, DXGI_FORMAT_R32_UINT,			1,	12,	D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA,	1},
 			};
 
 			auto xxx = 2.0f / 1280.0f;
@@ -77,14 +84,14 @@ namespace srima
 
 			std::vector<vertex1> vertices
 			{
-				{ DirectX::XMFLOAT3(-1.0f,			1.0f,		0.0f), DirectX::XMFLOAT4(0.8f, 1.0f, 0.0f, 1.0f) },
-				{ DirectX::XMFLOAT3(-1.0f + xxx,	1.0f,		0.0f), DirectX::XMFLOAT4(0.8f, 1.0f, 0.0f, 1.0f) },
-				{ DirectX::XMFLOAT3(-1.0f,			1.0f - yyy,	0.0f), DirectX::XMFLOAT4(0.8f, 1.0f, 0.0f, 1.0f) },
-				{ DirectX::XMFLOAT3(-1.0f + xxx,	1.0f - yyy,	0.0f), DirectX::XMFLOAT4(0.8f, 1.0f, 0.0f, 1.0f) },
+				{ DirectX::XMFLOAT3(-1.0f,			1.0f,		0.0f), DirectX::XMFLOAT4(0.5f, 0.8f, 0.3f, 1.0f) },
+				{ DirectX::XMFLOAT3(-1.0f + xxx,	1.0f,		0.0f), DirectX::XMFLOAT4(0.5f, 0.8f, 0.3f, 1.0f) },
+				{ DirectX::XMFLOAT3(-1.0f,			1.0f - yyy,	0.0f), DirectX::XMFLOAT4(0.5f, 0.8f, 0.3f, 1.0f) },
+				{ DirectX::XMFLOAT3(-1.0f + xxx,	1.0f - yyy,	0.0f), DirectX::XMFLOAT4(0.5f, 0.8f, 0.3f, 1.0f) },
 			};
 
-			std::vector<Vector3> ins;
-			ins.resize(1'150'000u);
+			std::vector<instance1> ins;
+			ins.resize(1'000'000u);
 
 			D3D12_INPUT_LAYOUT_DESC ild;
 			ild.pInputElementDescs = ied;

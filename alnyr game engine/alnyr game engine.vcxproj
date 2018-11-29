@@ -114,6 +114,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)alnyr rendering destination;$(SolutionDir)alnyr utility(bridge);$(CTTI_DIR);$(BOOST_1_68_0_DIR);$(ProjectDir);$(ProjectDir)alnyr_src;$(SolutionDir)srima rendering framework;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

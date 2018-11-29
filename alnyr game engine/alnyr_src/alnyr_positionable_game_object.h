@@ -1,8 +1,8 @@
 #pragma once
 
-#include <alnyr_material.h>
-#include <alnyr_transform.h>
-#include <alnyr_game_object.h>
+#include <alnyr_src/alnyr_material.h>
+#include <alnyr_src/alnyr_transform.h>
+#include <alnyr_src/alnyr_game_object.h>
 
 namespace alnyr
 {

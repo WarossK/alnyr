@@ -6,9 +6,10 @@ namespace alnyr
 {
 	class alnyrObjectBehavior
 	{
-	public:
-		alnyrGameObject const* game_object;
+	private:
+		alnyrGameObject* game_object;
 
+	public:
 		alnyrObjectBehavior() = delete;
 		alnyrObjectBehavior(alnyrGameObject* game_object) :
 			game_object(game_object) {}
@@ -16,5 +17,10 @@ namespace alnyr
 		virtual void Initialize() {}
 		virtual void Update() {}
 		virtual void Uninitialize() {}
+
+		alnyrGameObject* GetGameObject()
+		{
+			return game_object;
+		}
 	};
 }
